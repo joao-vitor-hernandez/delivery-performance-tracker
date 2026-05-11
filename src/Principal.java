@@ -50,6 +50,11 @@ public class Principal {
             }
 
             int totalGeral = totalSucesso + totalFalha;
+
+            if (totalGeral == 0) {
+                System.out.println("Nenhum dado disponível para o mês atual.");
+                return;
+            }
             double taxa = ((double) totalSucesso/totalGeral)*100;
 
             System.out.println("\n--- STATUS ACUMULADO DO MÊS ---");
@@ -99,6 +104,11 @@ public class Principal {
                     int suces = teclado.nextInt();
                     System.out.println("Quantos pacotes FALHOS/DEVOLVIDOS? ");
                     int fal = teclado.nextInt();
+
+                    if (suces < 0 || fal < 0) {
+                        System.out.println("ERRO: Os valores não podem ser negativos.");
+                        return;
+                    }
 
                     Entrega entregaDeHoje = new  Entrega(dataFinal, suces, fal);
                     salvarNoArquivo(entregaDeHoje);
