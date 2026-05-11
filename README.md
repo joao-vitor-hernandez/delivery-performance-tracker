@@ -1,27 +1,93 @@
-# Monitor de Metas - Mercado Livre (Envios Extra) 📦🚀
+# 📦 Delivery Performance Tracker
 
-## 📝 Descrição do Projeto
-Este é um software de console desenvolvido em **Java** para auxiliar entregadores do Mercado Livre no controle de suas métricas de desempenho. O objetivo principal é monitorar a **taxa de sucesso de 98%**, necessária para manter o status **Platina** na plataforma.
+A Java application designed to help delivery drivers track, analyze and recover their delivery performance based on real-world logistics metrics.
 
-## ⚙️ Funcionalidades
-- **Lançamento Diário:** Registro de pacotes entregues com sucesso e falhas.
-- **Histórico Retroativo:** Opção de inserir dados de datas passadas (formato DD/MM/AAAA).
-- **Persistência de Dados:** Salvamento automático em arquivo `.csv` (não perde os dados ao fechar).
-- **Relatório Mensal Inteligente:** Filtra apenas os registros do mês atual para o cálculo da meta.
-- **Cálculo de Projeção:** Informa exatamente quantas entregas perfeitas faltam para recuperar a meta de 98%.
+---
 
-## 🛠️ Tecnologias Utilizadas
-- **Linguagem:** Java (JDK 26+)
-- **Paradigma:** Programação Orientada a Objetos (POO)
-- **Armazenamento:** Arquivo de texto CSV (Manipulado via `BufferedReader` e `PrintWriter`)
-- **IDE:** Visual Studio Code
+## 🚀 Overview
 
-## 📁 Estrutura de Arquivos
-- `Entrega.java`: Classe de modelo (molde) para os objetos de entrega.
-- `Principal.java`: Classe principal com a lógica de menus, cálculos e manipulação de arquivos.
-- `entregas.csv`: Banco de dados simples gerado pelo sistema.
+This project simulates a real logistics scenario where delivery performance must reach a **98% success rate**.
 
-## 🚀 Como Executar
-1. Certifique-se de ter o Java instalado.
-2. Abra a pasta do projeto no VS Code.
-3. Execute o arquivo `Principal.java`.
+The system allows users to:
+
+- Register daily deliveries (success/failure)
+- Store historical data locally (CSV)
+- Calculate monthly performance
+- Predict how many successful deliveries are needed to recover performance
+
+---
+
+## 🧠 Business Logic
+
+The application:
+
+- Filters only current month data  
+- Calculates success rate  
+- Applies performance recovery logic  
+- Handles invalid inputs safely  
+
+---
+
+## 🛠️ Technologies
+
+- Java  
+- Object-Oriented Programming (OOP)  
+- File Handling (CSV)  
+- Exception Handling  
+
+---
+
+## ▶️ How to Run
+
+```bash
+javac *.java
+java Principal
+```
+
+---
+
+## 📊 Example Output
+--- MONTHLY PERFORMANCE ---
+Total Deliveries: 94
+Success Rate: 95.74%
+
+⚠ ALERT: You need 8 perfect deliveries to recover your performance.
+
+---
+
+## 🎯 Purpose
+
+This project was built to solve a real-world problem faced by delivery drivers, applying programming concepts to practical scenarios.
+
+---
+
+## 🚧 Next Steps
+
+- Improve code structure (separation of responsibilities)
+- Add database integration
+- Build API layer
+- Develop mobile version (Android)
+
+---
+
+## 👨‍💻 Author
+
+João Vitor Hernandez  
+🔗 https://www.linkedin.com/in/joão-vitor-hernandez-060831409
+
+---
+
+---
+
+## 🇧🇷 Versão em Português
+
+### 📦 Monitor de Metas - Mercado Livre (Envios Extra)
+
+Aplicação em Java desenvolvida para auxiliar entregadores no controle de desempenho, com foco na meta de **98% de sucesso** exigida para o nível Platina.
+
+### Funcionalidades:
+- Registro de entregas (sucesso/falha)
+- Histórico com datas retroativas
+- Persistência em CSV
+- Cálculo automático de desempenho mensal
+- Projeção de recuperação de meta
