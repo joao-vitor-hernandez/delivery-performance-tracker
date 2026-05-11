@@ -14,7 +14,7 @@ public class Principal {
         //try catch é para possíveis erros que o usuário digitar, pegar somente oque é certo
         try (FileWriter fw = new FileWriter("entregas.csv", true);PrintWriter pw = new PrintWriter(fw)){
 
-        pw.println(entrega.data + "," + entrega.sucessos + "," + entrega.falhas);
+        pw.println(entrega.getData() + "," + entrega.getSucessos() + "," + entrega.getFalhas());
         System.out.println("Dados salvos no arquivo entregas.csv");
     } catch (IOException e){
         System.out.println("Erro ao salvar os dados: " + e.getMessage());
@@ -107,10 +107,10 @@ public class Principal {
 
                     if (suces < 0 || fal < 0) {
                         System.out.println("ERRO: Os valores não podem ser negativos.");
-                        return;
                     }
 
                     Entrega entregaDeHoje = new  Entrega(dataFinal, suces, fal);
+                    System.out.println("Gravando entrega do dia: " + entregaDeHoje.getData());
                     salvarNoArquivo(entregaDeHoje);
                 } catch(DateTimeParseException e) {
                     System.out.println("ERRO: Formato de data inválido! Use: DD/MM/AAAA");
@@ -119,7 +119,7 @@ public class Principal {
                     teclado.next();
                 }
             } else if (opcao == 2) {
-                System.out.println("\n[Relatór  io Mensal]");
+                System.out.println("\n[Relatório Mensal]");
                 carregarERelatar();
             } else if (opcao == 3) {
                 System.out.println("Saindo... Boa rota amanhã!");

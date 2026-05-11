@@ -2,9 +2,19 @@ import java.time.LocalDate;
 
 public class Entrega {
     //1. Atributos (As informações que a ficha vai guardar)
-    public LocalDate data;
-    public int sucessos;
-    public int falhas;
+    private LocalDate data;
+    private int sucessos;
+    private int falhas;
+
+    public LocalDate getData(){
+        return this.data;
+    }
+    public int getSucessos(){
+        return sucessos;
+    }
+    public int getFalhas (){
+        return falhas;
+    }
 
     // 2. Construtor (O botão que "imprime" uma ficha nova preenchida)
     public Entrega(LocalDate data, int sucessos, int falhas) {
