@@ -9,6 +9,13 @@
             "name": "Principal",
             "request": "launch",
             "mainClass": "Principal",
+            "projectName": "delivery-performance-tracker_8f8b3a06"
+        },
+        {
+            "type": "java",
+            "name": "Principal",
+            "request": "launch",
+            "mainClass": "Principal",
             "projectName": "mercado_livre_app_e9c812ae"
         },
         {

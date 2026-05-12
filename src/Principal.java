@@ -32,21 +32,28 @@ public class Principal {
         try (BufferedReader br = new BufferedReader(new FileReader("entregas.csv"))){
             String linha;
             while ((linha = br.readLine()) != null) {
-                /* A linha vem assim: "2026-05-07,43,1"
-                    Para retirar as virgulas é o seguinte comando: 
-                */ 
-               String[] partes = linha.split(",");
+                if (linha.trim().isEmpty()) {
+                    continue;
+                }
+                String[] partes = linha.split(",");
+                if (partes.length < 3) {
+                    System.out.println("AVISO: Pulando linha mal formatada no arquivo.");
+                    continue;
+                }
+                try{
+                    //transformando o texto data em objeto data
+                    LocalDate dataRegistro = LocalDate.parse(partes[0]);
 
-               //transformando o texto data em objeto data
-               LocalDate dataRegistro = LocalDate.parse(partes[0]);
-
-               // O índice [1] é sucesso e [2] é falha
-               //só soma se for o mês/ano atual
-               if (dataRegistro.getMonthValue() == mesAtual && dataRegistro.getYear() == anoAtual) {
-                    totalSucesso += Integer.parseInt(partes[1]);
-                    totalFalha += Integer.parseInt(partes[2]);
-               }
-               
+                    // O índice [1] é sucesso e [2] é falha
+                    //só soma se for o mês/ano atual
+                    if (dataRegistro.getMonthValue() == mesAtual && dataRegistro.getYear() == anoAtual) {
+                        totalSucesso += Integer.parseInt(partes[1]);
+                        totalFalha += Integer.parseInt(partes[2]);
+                    }
+                } catch (DateTimeParseException | NumberFormatException e){
+                    //se a data estiver em um formato diferente ou os números não forem números
+                    System.out.println("AVISO: Erro de conversão em uma linha do arquivo. Pulando...");
+                }
             }
 
             int totalGeral = totalSucesso + totalFalha;
