@@ -1,67 +1,38 @@
 import java.time.LocalDate; //Para que o java consiga ver a data do aparelho
 import java.util.Scanner;
-import java.io.FileWriter; //Para escrever arquivos
-import java.io.PrintWriter; //Para formatar o texto no arquivo
-import java.io.IOException; //Para lidar com erros no arquivo
-import java.io.BufferedReader; //Para ler o arquivo
-import java.io.FileReader; //Para abrir o arquivo de leitura
 import java.time.format.DateTimeFormatter; //tradutor de datas
 import java.time.format.DateTimeParseException; //para erro de datas
 import java.util.InputMismatchException; //para erro de números
+import model.Entrega;
+import repository.EntregaRepository;
+import java.util.List;
 
 public class Principal {
-    public static void salvarNoArquivo(Entrega entrega){
-        //try catch é para possíveis erros que o usuário digitar, pegar somente oque é certo
-        try (FileWriter fw = new FileWriter("entregas.csv", true);PrintWriter pw = new PrintWriter(fw)){
+    public static void carregarERelatar(EntregaRepository repository){
+        List<Entrega> todasEntregas = repository.buscarTodas();
 
-        pw.println(entrega.getData() + "," + entrega.getSucessos() + "," + entrega.getFalhas());
-        System.out.println("Dados salvos no arquivo entregas.csv");
-    } catch (IOException e){
-        System.out.println("Erro ao salvar os dados: " + e.getMessage());
-    }
-    }
-
-    public static void carregarERelatar(){
         int totalSucesso = 0;
         int totalFalha = 0;
 
         LocalDate dataAtual = LocalDate.now();
         int mesAtual = dataAtual.getMonthValue();
-        int anoAtual =  dataAtual.getYear();
+        int anoAtual = dataAtual.getYear();
 
-        try (BufferedReader br = new BufferedReader(new FileReader("entregas.csv"))){
-            String linha;
-            while ((linha = br.readLine()) != null) {
-                if (linha.trim().isEmpty()) {
-                    continue;
-                }
-                String[] partes = linha.split(",");
-                if (partes.length < 3) {
-                    System.out.println("AVISO: Pulando linha mal formatada no arquivo.");
-                    continue;
-                }
-                try{
-                    //transformando o texto data em objeto data
-                    LocalDate dataRegistro = LocalDate.parse(partes[0]);
-
-                    // O índice [1] é sucesso e [2] é falha
-                    //só soma se for o mês/ano atual
-                    if (dataRegistro.getMonthValue() == mesAtual && dataRegistro.getYear() == anoAtual) {
-                        totalSucesso += Integer.parseInt(partes[1]);
-                        totalFalha += Integer.parseInt(partes[2]);
-                    }
-                } catch (DateTimeParseException | NumberFormatException e){
-                    //se a data estiver em um formato diferente ou os números não forem números
-                    System.out.println("AVISO: Erro de conversão em uma linha do arquivo. Pulando...");
-                }
+        //agora vai buscar a lista em repository
+        for (Entrega e : todasEntregas){
+            if (e.getData() == null) continue;
+            
+            if (e.getData().getMonthValue() == mesAtual && e.getData().getYear() == anoAtual) {
+                totalSucesso += e.getSucessos();
+                totalFalha += e.getFalhas();
             }
+        }
 
-            int totalGeral = totalSucesso + totalFalha;
-
-            if (totalGeral == 0) {
-                System.out.println("Nenhum dado disponível para o mês atual.");
-                return;
-            }
+        int totalGeral = totalSucesso + totalFalha;
+        if (totalGeral == 0) {
+            System.out.println("Nenhum dado disponível para o mês atual.");
+            return;
+        }
             double taxa = ((double) totalSucesso/totalGeral)*100;
 
             System.out.println("\n--- STATUS ACUMULADO DO MÊS ---");
@@ -76,12 +47,10 @@ public class Principal {
             } else {
                 System.out.println("PARABÉNS: Você está na meta Platina!");
             }
-        } catch (IOException e) {
-            System.out.println("Ainda não existem dados salvos para gerar o relatório.");
-        }
     }
     public static void main(String[] args) {
         Scanner teclado = new Scanner(System.in);
+        EntregaRepository repository = new EntregaRepository();
         int opcao = 0;
 
         while (opcao != 3) {
@@ -90,12 +59,18 @@ public class Principal {
             System.out.println("2. Ver relatório e quanto falta para Platina");
             System.out.println("3. Sair");
             System.out.print("Escolha uma opção: ");
-            opcao = teclado.nextInt();
+            try{
+                opcao = teclado.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("ERRO: Digite apenas números para o menu.");
+                teclado.next();
+                continue;
+            }
 
             if (opcao == 1) {
                 try{
                     System.out.println("\n[Lançamento de Entrega]");
-                    System.out.println("Data (DD/MM/AAAA) ou 'hoje': ");
+                    System.out.print("Data (DD/MM/AAAA) ou 'hoje': ");
                     String dataInput = teclado.next();
                 
                     LocalDate dataFinal;
@@ -114,11 +89,11 @@ public class Principal {
 
                     if (suces < 0 || fal < 0) {
                         System.out.println("ERRO: Os valores não podem ser negativos.");
+                    } else {
+                        Entrega entregaDeHoje = new Entrega(dataFinal, suces, fal);
+                        System.out.println("Gravando entrega do dia: " + entregaDeHoje.getData());
+                        repository.salvar(entregaDeHoje); //salvando através do repository
                     }
-
-                    Entrega entregaDeHoje = new  Entrega(dataFinal, suces, fal);
-                    System.out.println("Gravando entrega do dia: " + entregaDeHoje.getData());
-                    salvarNoArquivo(entregaDeHoje);
                 } catch(DateTimeParseException e) {
                     System.out.println("ERRO: Formato de data inválido! Use: DD/MM/AAAA");
                 } catch(InputMismatchException e) {
@@ -127,7 +102,7 @@ public class Principal {
                 }
             } else if (opcao == 2) {
                 System.out.println("\n[Relatório Mensal]");
-                carregarERelatar();
+                carregarERelatar(repository);
             } else if (opcao == 3) {
                 System.out.println("Saindo... Boa rota amanhã!");
             } else {
