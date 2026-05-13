@@ -14,20 +14,12 @@ public class Principal {
         EntregaService service = new EntregaService(repository);
         List<Entrega> entregaDoMes = service.obterEntregasDoMesAtual();
 
-        int totalSucesso = 0;
-        int totalFalha = 0;
-
-        for(Entrega e : entregaDoMes){
-            totalSucesso += e.getSucessos();
-            totalFalha += e.getFalhas();
-        }
-
-        int totalGeral = totalSucesso + totalFalha;
-        if (totalGeral == 0) {
+        if (entregaDoMes.isEmpty()) {
             System.out.println("Nenhum dado disponível para o mês atual.");
             return;
         }
-            double taxa = ((double) totalSucesso/totalGeral)*100;
+            double taxa = service.calcularTaxaSucesso(entregaDoMes);
+            int totalGeral = entregaDoMes.stream().mapToInt(e -> e.getSucessos() + e.getFalhas()).sum();
 
             System.out.println("\n--- STATUS ACUMULADO DO MÊS ---");
             System.out.println("Total de pacotes: " + totalGeral);
@@ -35,8 +27,7 @@ public class Principal {
 
             //lógica dos 98%
             if (taxa < 98) {
-                double meta = 0.98;
-                double faltam = (meta*totalGeral - totalSucesso) / (1-meta);
+                int faltam = service.calcularProjecaoPlatina(entregaDoMes, 0.98);
                 System.out.printf("ALERTA: Faltam %d entregas perfeitas para chegar em 98%%!\n", (int) Math.ceil(faltam));
             } else {
                 System.out.println("PARABÉNS: Você está na meta Platina!");
