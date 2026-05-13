@@ -5,27 +5,21 @@ import java.time.format.DateTimeParseException; //para erro de datas
 import java.util.InputMismatchException; //para erro de números
 import model.Entrega;
 import repository.EntregaRepository;
+import service.EntregaService;
+
 import java.util.List;
 
 public class Principal {
     public static void carregarERelatar(EntregaRepository repository){
-        List<Entrega> todasEntregas = repository.buscarTodas();
+        EntregaService service = new EntregaService(repository);
+        List<Entrega> entregaDoMes = service.obterEntregasDoMesAtual();
 
         int totalSucesso = 0;
         int totalFalha = 0;
 
-        LocalDate dataAtual = LocalDate.now();
-        int mesAtual = dataAtual.getMonthValue();
-        int anoAtual = dataAtual.getYear();
-
-        //agora vai buscar a lista em repository
-        for (Entrega e : todasEntregas){
-            if (e.getData() == null) continue;
-            
-            if (e.getData().getMonthValue() == mesAtual && e.getData().getYear() == anoAtual) {
-                totalSucesso += e.getSucessos();
-                totalFalha += e.getFalhas();
-            }
+        for(Entrega e : entregaDoMes){
+            totalSucesso += e.getSucessos();
+            totalFalha += e.getFalhas();
         }
 
         int totalGeral = totalSucesso + totalFalha;
