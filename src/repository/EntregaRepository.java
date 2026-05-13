@@ -2,11 +2,13 @@ package repository;
 
 import model.Entrega;
 import java.io.*;
+import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class EntregaRepository {
-    private final String CAMINHO_ARQUIVO = "entregas.csv";
+    private static final String CAMINHO_ARQUIVO = "entregas.csv";
 
     public void salvar (Entrega entrega){
         try (FileWriter fw = new FileWriter(CAMINHO_ARQUIVO, true);
@@ -26,13 +28,18 @@ public class EntregaRepository {
             String linha;
             while ((linha = br.readLine()) != null) {
                 if (linha.trim().isEmpty()) continue;            
-                
-                String[] partes = linha.split(",");
-                if (partes.length < 3) continue;                   
-                
-                //transformação da linha do CSV de volta em Objeto Entrega
-                Entrega e = new Entrega(java.time.LocalDate.parse(partes[0]), Integer.parseInt(partes[1]), Integer.parseInt(partes[2]));
-                lista.add(e);
+                try{
+                    String[] dados = linha.split(",");
+                    //conversão dos dados em segurança
+                    LocalDate data = LocalDate.parse(dados[0].trim());
+                    int sucesso = Integer.parseInt(dados[1].trim());
+                    int falha = Integer.parseInt(dados[2].trim());                   
+                    
+                    lista.add(new Entrega(data, sucesso, falha));
+                } catch (NumberFormatException | DateTimeException | ArrayIndexOutOfBoundsException e){
+                    //se der algum erro em uma linha, ele cai aqui, avisa e vai pra próxima linha
+                    System.err.println("AVISO: Linha inválida ignorada nos CSV -> " + linha);
+                }
             }
         } catch (IOException e) {
             // Se o arquivo não existir, retornamos a lista vazia sem crashar
