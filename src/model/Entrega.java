@@ -9,9 +9,16 @@ public class Entrega {
 
     // 2. Construtor (O botão que "imprime" uma ficha nova preenchida)
     public Entrega(LocalDate data, int sucessos, int falhas) {
+        validarValores(sucessos,falhas);
         this.data = data;
         this.sucessos = sucessos;
         this.falhas = falhas;
+    }
+
+    private void validarValores(int sucessos, int falhas){
+        if (sucessos < 0 || falhas < 0) {
+            throw new IllegalArgumentException("Os valores de pacotes não podem ser negativos.");
+        }
     }
     
     public LocalDate getData(){

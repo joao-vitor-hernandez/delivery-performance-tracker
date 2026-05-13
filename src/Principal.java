@@ -72,18 +72,17 @@ public class Principal {
                     System.out.println("Quantos pacotes FALHOS/DEVOLVIDOS? ");
                     int fal = teclado.nextInt();
 
-                    if (suces < 0 || fal < 0) {
-                        System.out.println("ERRO: Os valores não podem ser negativos.");
-                    } else {
-                        Entrega entregaDeHoje = new Entrega(dataFinal, suces, fal);
-                        System.out.println("Gravando entrega do dia: " + entregaDeHoje.getData());
-                        repository.salvar(entregaDeHoje); //salvando através do repository
-                    }
+                    Entrega entregaDeHoje = new Entrega(dataFinal, suces, fal);
+                    System.out.println("Gravando entrega do dia: " + entregaDeHoje.getData());
+                    repository.salvar(entregaDeHoje);
+
                 } catch(DateTimeParseException e) {
                     System.out.println("ERRO: Formato de data inválido! Use: DD/MM/AAAA");
                 } catch(InputMismatchException e) {
                     System.out.println("ERRO: Digite apenas números para sucessos e falhas.");
                     teclado.next();
+                } catch(IllegalArgumentException e){
+                    System.out.println("ERRO DE VALIDAÇÃO: " + e.getMessage());
                 }
             } else if (opcao == 2) {
                 System.out.println("\n[Relatório Mensal]");
