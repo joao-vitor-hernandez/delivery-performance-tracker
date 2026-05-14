@@ -19,28 +19,32 @@ public class EntregaService {
 
         return todas.stream().filter(e -> e.getData().getMonthValue() == hoje.getMonthValue() && e.getData().getYear() == hoje.getYear()).collect(Collectors.toList());
     }
+    private int[] calcularTotais(List<Entrega> entregas){
+        int sucessos = entregas.stream().mapToInt(Entrega::getSucessos).sum();
+        int falhas = entregas.stream().mapToInt(Entrega::getFalhas).sum();
+        return new int[]{sucessos,falhas};
+    }
 
     public double calcularTaxaSucesso(List<Entrega> entregas){
-        int totalSucesso = entregas.stream().mapToInt(Entrega::getSucessos).sum();
-        int totalFalha = entregas.stream().mapToInt(Entrega::getFalhas).sum();
-        int totalGeral = totalSucesso + totalFalha;
+        int[] totais = calcularTotais(entregas);
+        int totalSucesso = totais[0];
+        int totalGeral = totais[0] + totais[1];
 
         if (totalGeral == 0) return 0;
         return((double)totalSucesso/totalGeral)*100;
     }
 
     public int calcularProjecaoPlatina(List<Entrega> entregas, double metaDesejada){
-        int totalSucesso = entregas.stream().mapToInt(Entrega::getSucessos).sum();
-        int totalFalha = entregas.stream().mapToInt(Entrega::getFalhas).sum();
-        int totalGeral = totalSucesso + totalFalha;
+        int[] totais = calcularTotais(entregas);
+        int totalSucesso = totais[0];
+        int totalGeral = totais[0] + totais[1];
 
         //proteção para caso a meta seja 100% a conta não seja divida por zero
         if (metaDesejada >= 1.0) {
-            return totalFalha;
+            return totais[1];
         }
 
         double faltam = (metaDesejada*totalGeral-totalSucesso)/(1-metaDesejada);
-
         return Math.max(0,(int) Math.ceil(faltam));
     }
 }
