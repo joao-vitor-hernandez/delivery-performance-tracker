@@ -22,26 +22,25 @@ public class EntregaService {
     private int[] calcularTotais(List<Entrega> entregas){
         int sucessos = entregas.stream().mapToInt(Entrega::getSucessos).sum();
         int falhas = entregas.stream().mapToInt(Entrega::getFalhas).sum();
-        return new int[]{sucessos,falhas};
+        int geral = sucessos + falhas;
+        return new int[]{sucessos,falhas,geral};
     }
 
     public double calcularTaxaSucesso(List<Entrega> entregas){
         int[] totais = calcularTotais(entregas);
-        int totalSucesso = totais[0];
-        int totalGeral = totais[0] + totais[1];
-
-        if (totalGeral == 0) return 0;
-        return((double)totalSucesso/totalGeral)*100;
+        if (totais[2] == 0) return 0;
+        return((double)totais[0]/totais[2])*100;
     }
 
     public int calcularProjecaoPlatina(List<Entrega> entregas, double metaDesejada){
         int[] totais = calcularTotais(entregas);
         int totalSucesso = totais[0];
-        int totalGeral = totais[0] + totais[1];
+        int totalFalha = totais[1];
+        int totalGeral = totais[2];
 
         //proteção para caso a meta seja 100% a conta não seja divida por zero
         if (metaDesejada >= 1.0) {
-            return totais[1];
+            return totalFalha;
         }
 
         double faltam = (metaDesejada*totalGeral-totalSucesso)/(1-metaDesejada);
