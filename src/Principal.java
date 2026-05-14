@@ -19,7 +19,7 @@ public class Principal {
             return;
         }
             double taxa = service.calcularTaxaSucesso(entregaDoMes);
-            int totalGeral = entregaDoMes.stream().mapToInt(e -> e.getSucessos() + e.getFalhas()).sum();
+            int totalGeral = service.getTotalPacotes(entregaDoMes);
 
             System.out.println("\n--- STATUS ACUMULADO DO MÊS ---");
             System.out.println("Total de pacotes: " + totalGeral);

@@ -19,6 +19,11 @@ public class EntregaService {
 
         return todas.stream().filter(e -> e.getData().getMonthValue() == hoje.getMonthValue() && e.getData().getYear() == hoje.getYear()).collect(Collectors.toList());
     }
+    
+    public int getTotalPacotes (List<Entrega> entregas){
+        return calcularTotais(entregas)[2];
+    }
+    
     private int[] calcularTotais(List<Entrega> entregas){
         int sucessos = entregas.stream().mapToInt(Entrega::getSucessos).sum();
         int falhas = entregas.stream().mapToInt(Entrega::getFalhas).sum();
