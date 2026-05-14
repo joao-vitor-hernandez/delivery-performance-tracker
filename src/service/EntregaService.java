@@ -34,8 +34,13 @@ public class EntregaService {
         int totalFalha = entregas.stream().mapToInt(Entrega::getFalhas).sum();
         int totalGeral = totalSucesso + totalFalha;
 
+        //proteção para caso a meta seja 100% a conta não seja divida por zero
+        if (metaDesejada >= 1.0) {
+            return totalFalha;
+        }
+
         double faltam = (metaDesejada*totalGeral-totalSucesso)/(1-metaDesejada);
 
-        return (int) Math.ceil(faltam);
+        return Math.max(0,(int) Math.ceil(faltam));
     }
 }

@@ -67,9 +67,9 @@ public class Principal {
                         //aqui o java transforma o texto da data em uma data real
                         dataFinal = LocalDate.parse(dataInput, formatoBR);
                     }
-                    System.out.println("Quantos pacotes entregues com SUCESSO? ");
+                    System.out.print("Quantos pacotes entregues com SUCESSO? ");
                     int suces = teclado.nextInt();
-                    System.out.println("Quantos pacotes FALHOS/DEVOLVIDOS? ");
+                    System.out.print("Quantos pacotes FALHOS/DEVOLVIDOS? ");
                     int fal = teclado.nextInt();
 
                     Entrega entregaDeHoje = new Entrega(dataFinal, suces, fal);
@@ -85,7 +85,9 @@ public class Principal {
                     System.out.println("ERRO DE VALIDAÇÃO: " + e.getMessage());
                 }
             } else if (opcao == 2) {
+                System.out.println("\n=====================");
                 System.out.println("\n[Relatório Mensal]");
+                System.out.println("=====================");
                 carregarERelatar(repository);
             } else if (opcao == 3) {
                 System.out.println("Saindo... Boa rota amanhã!");
