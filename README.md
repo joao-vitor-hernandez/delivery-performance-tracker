@@ -2,6 +2,7 @@
 
 ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Architecture](https://img.shields.io/badge/Architecture-Layered%20(MVC)-blue)
+![UI Design](https://img.shields.io/badge/UI%2FUX-Figma-hotpink)
 ![Status](https://img.shields.io/badge/Status-Active-success)
 
 A Java application designed to help delivery drivers track, analyze, and recover their delivery performance based on real-world logistics metrics.
@@ -17,6 +18,21 @@ The system allows users to:
 - Store historical data locally (CSV) with robust error handling.
 - Calculate monthly performance dynamically.
 - Predict mathematically how many perfect deliveries are needed to reach or maintain the 98% goal.
+
+---
+
+## 🎨 UI/UX Design (Mobile Concept)
+
+To evolve the project from a CLI (Command Line Interface) to a full mobile experience, a high-fidelity prototype was developed using **Figma**. The design focuses on **Dark Mode** for driver comfort and quick data entry during shifts.
+
+| Login Screen | Dashboard (Home) | New Entry | History |
+| :---: | :---: | :---: | :---: |
+| ![Login](assets/login.png) | ![Home](assets/principal.png) | ![Entry](assets/novaEntrega.png) | ![History](assets/historico.png) |
+
+> **Key Design Features:**
+> - **Personalized Greeting:** User-centric dashboard.
+> - **Goal Predictor:** Visual feedback on how many "clean" deliveries are needed.
+> - **One-Handed Operation:** Floating Action Button (FAB) for quick logging.
 
 ---
 
@@ -37,6 +53,7 @@ The project was refactored from a simple script into a professional **Layered Ar
 - **Object-Oriented Programming (OOP)**
 - **Defensive Programming & Exception Handling:** Prevents crashes from invalid user inputs (`InputMismatchException`) or corrupted files.
 - **Clean Code:** Clear method responsibilities and descriptive naming conventions.
+- **UI/UX:** Prototyping in Figma with focus on Material Design 3.
 
 ---
 
@@ -66,13 +83,10 @@ This project was built to solve a real-world problem faced by delivery drivers, 
 
 ## 🚧 Roadmap & Next Steps
 [x] Refactor architecture (Separation of Concerns).
-
+[/] UI/UX Mobile Prototyping (Figma).
 [ ] Implement Cloud Database integration (e.g., PostgreSQL or Firebase).
-    
 [ ] Build an API layer (Spring Boot).
-
 [ ] Privacy by Design: Implement data hashing for sensitive information (LGPD compliance).
-
 [ ] Develop Mobile Frontend (Android/Java).
 
 ---
@@ -89,19 +103,13 @@ João Vitor Hernandez
 ## 🇧🇷 Versão em Português
 
 ### 📦 Monitor de Metas - Logística
-Uma aplicação em Java criada para ajudar entregadores a rastrear, analisar e recuperar sua performance de entregas baseada em métricas reais (nível Platina - 98%).
+Uma aplicação em Java criada para ajudar entregadores a rastrear e recuperar sua performance baseada na meta de 98% (Nível Platina).
 
-## 🏗️ Arquitetura e Engenharia
-O projeto utiliza uma Arquitetura em Camadas para garantir manutenibilidade:
+#### 🎨 Design UI/UX
+O projeto evoluiu para um conceito mobile moderno em **Dark Mode**, focado em usabilidade prática para o dia a dia na rua. O protótipo inclui login social, dashboard de metas com "Olá, Nome" e ferramenta de previsão de entregas necessárias.
 
-Model: Validação de regras de negócio na origem (impede dados negativos).
-Service: Centraliza toda a inteligência e projeções matemáticas (Princípio DRY).
-Repository: Isola a leitura e gravação de arquivos CSV, com proteção contra linhas corrompidas.
-UI: Interface de terminal totalmente independente das fórmulas matemáticas.
-
-### Funcionalidades:
-- Registro de entregas (sucesso/falha)
-- Histórico com datas retroativas
-- Persistência em CSV
-- Cálculo automático de desempenho mensal
-- Projeção de recuperação de meta
+#### 🏗️ Arquitetura e Engenharia
+- **Model:** Validação de regras de negócio na origem.
+- **Service:** Projeções matemáticas e lógica de recuperação.
+- **Repository:** Isolamento de leitura de arquivos CSV.
+- **UI:** Interface de terminal independente das fórmulas.
