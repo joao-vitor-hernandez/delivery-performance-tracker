@@ -82,12 +82,12 @@ This project was built to solve a real-world problem faced by delivery drivers, 
 ---
 
 ## 🚧 Roadmap & Next Steps
-[x] Refactor architecture (Separation of Concerns).
-[/] UI/UX Mobile Prototyping (Figma).
-[ ] Implement Cloud Database integration (e.g., PostgreSQL or Firebase).
-[ ] Build an API layer (Spring Boot).
-[ ] Privacy by Design: Implement data hashing for sensitive information (LGPD compliance).
-[ ] Develop Mobile Frontend (Android/Java).
+- [x] Refactor architecture (Separation of Concerns).
+- [/] UI/UX Mobile Prototyping (Figma).
+- [ ] Implement Cloud Database integration (e.g., PostgreSQL or Firebase).
+- [ ] Build an API layer (Spring Boot).
+- [ ] Privacy by Design: Implement data hashing for sensitive information (LGPD compliance).
+- [ ] Develop Mobile Frontend (Android/Java).
 
 ---
 
