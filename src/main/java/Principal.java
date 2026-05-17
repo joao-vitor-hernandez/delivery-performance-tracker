@@ -28,7 +28,7 @@ public class Principal {
             //lógica dos 98%
             if (taxa < 98) {
                 int faltam = service.calcularProjecaoPlatina(entregaDoMes, 0.98);
-                System.out.printf("ALERTA: Faltam %d entregas perfeitas para chegar em 98%%!\n", (int) Math.ceil(faltam));
+                System.out.printf("ALERTA: Faltam %d entregas perfeitas para chegar em 98%%!\n", faltam);
             } else {
                 System.out.println("PARABÉNS: Você está na meta Platina!");
             }
