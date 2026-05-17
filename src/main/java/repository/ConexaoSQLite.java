@@ -21,19 +21,26 @@ public class ConexaoSQLite {
 
     //método que cria a tabela caso seja a primeira vez rodando o programa
     public static void criarTabelaSeNaoExistir() {
-        String sql = "CREATE TABLE IF NOT EXISTS entregas ("
+        String sqlEntrega = "CREATE TABLE IF NOT EXISTS entregas ("
                    + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                    + "data TEXT NOT NULL,"
                    + "sucessos INTEGER NOT NULL,"
                    + "falhas INTEGER NOT NULL"
                    + ");";
         
+        String sqlUsuarios = "CREATE TABLE IF NOT EXISTS usuarios ("
+                           + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                           + "username TEXT NOT NULL UNIQUE," // UNIQUE impede dois usuários com o mesmo nome
+                           + "senha_hash TEXT NOT NULL"
+                           + ");";
+        
         try (Connection conn = conectar();
             Statement stmt = conn.createStatement()) {
 
-            stmt.execute(sql); //manda o comando SQL para o banco de dados
+            stmt.execute(sqlEntrega); //cria a tabela Entrega
+            stmt.execute(sqlUsuarios); //cria a tabela Usuarios
         } catch (SQLException e){
-            System.err.println("ERRO: ao criar a tabela: " + e.getMessage());
+            System.err.println("ERRO: ao criar as tabelas: " + e.getMessage());
         }
     }
 }

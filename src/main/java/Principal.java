@@ -4,9 +4,13 @@ import java.time.format.DateTimeFormatter; //tradutor de datas
 import java.time.format.DateTimeParseException; //para erro de datas
 import java.util.InputMismatchException; //para erro de números
 import model.Entrega;
+import model.Usuario;
+import repository.ConexaoSQLite;
 import repository.EntregaRepository;
+import repository.UsuarioRepository;
 import service.EntregaService;
 import service.RelatorioPdfService;
+import service.SenhaService;
 
 import java.util.List;
 
@@ -40,67 +44,136 @@ public class Principal {
             }
     }
     public static void main(String[] args) {
-        repository.ConexaoSQLite.criarTabelaSeNaoExistir();
-        
-        Scanner teclado = new Scanner(System.in);
-        EntregaRepository repository = new EntregaRepository();
-        int opcao = 0;
+        ConexaoSQLite.criarTabelaSeNaoExistir(); //inicialização do banco de dados
 
-        while (opcao != 4) {
-            System.out.println("\n--- MONITOR MERCADO ENVIO (META 98%) ---");
-            System.out.println("1. Lançar entregas");
-            System.out.println("2. Ver relatório e quanto falta para Platina");
-            System.out.println("3. Exportar relatório do mês em PDF");
-            System.out.println("4. Sair");
-            System.out.print("Escolha uma opção: ");
-            try{
-                opcao = teclado.nextInt();
-            } catch (InputMismatchException e) {
-                System.out.println("ERRO: Digite apenas números para o menu.");
-                teclado.next();
-                continue;
+        //DATA SEEDING: criação automatica do usuario admin para testes
+        UsuarioRepository usuarioRepository = new UsuarioRepository();
+        if (usuarioRepository.buscarPorUsername("admin") == null) {
+            String senhaHashAdmin = SenhaService.gerarHash("admin");
+            usuarioRepository.salvar(new Usuario("admin", senhaHashAdmin));
+        }
+        Scanner teclado = new Scanner(System.in);
+        EntregaRepository entregaRepository = new EntregaRepository();
+
+        boolean fecharSistemaCompleto = false;
+
+        //LOOP PRINCIPAL
+        while (!fecharSistemaCompleto) {
+            Usuario usuarioLogado = null;
+
+            //SUB-LOOP
+            while (usuarioLogado == null && !fecharSistemaCompleto) {
+                System.out.println("\n=== ACESSO AO SISTEMA ===");
+                System.out.println("1. Fazer login");
+                System.out.println("2. Cadastrar Novo Motorista");
+                System.out.println("3. Sair do Programa");
+                System.out.print("Escolha uma opção: ");
+
+                int opcaoAuth = 0;
+                try {
+                    opcaoAuth = teclado.nextInt();
+                } catch(InputMismatchException e) {
+                    System.out.println("ERRO: Digite apenas números para o acesso.");
+                    teclado.next();
+                    continue;
+                }
+
+                if (opcaoAuth == 1) {
+                    System.out.print("Usuário: ");
+                    String user = teclado.next();
+                    System.out.print("Senha: ");
+                    String senha = teclado.next();
+
+                    //buscar usuário no banco de dados
+                    Usuario usuarioBanco = usuarioRepository.buscarPorUsername(user);
+
+                    //valida se o usuário existe e se a senha bate com o Hash
+                    if (usuarioBanco != null && SenhaService.verificarSenha(senha, usuarioBanco.getSenhaHash())) {
+                        usuarioLogado = usuarioBanco;
+                        System.out.println("\nLogin efetuado com sucesso.");
+                    } else {
+                        System.out.println("\n ERRO: Usuário ou senha inválidos.");
+                    }
+                } else if(opcaoAuth == 2) {
+                    System.out.println("\n[Cadastro de Novo Motorista]");
+                    System.out.print("Digite o usuário desejado: ");
+                    String novoUser = teclado.next();
+                    System.out.print("Digite a senha: ");
+                    String novaSenha = teclado.next();
+
+                    //aplica o hash do BCrypt antes de mandar para o repositório
+                    String senhaMascarada = SenhaService.gerarHash(novaSenha);
+                    Usuario novoUsuario = new Usuario(novoUser, senhaMascarada);
+
+                    if (usuarioRepository.salvar(novoUsuario)) {
+                        System.out.println("Cadastro realizado! Uso a opção 1 para entrar.");
+                    }
+                } else if (opcaoAuth == 3) {
+                    System.out.println("Encerrando o monitor... Até a próxima rota!");
+                    fecharSistemaCompleto = true;
+                } else {
+                    System.out.println("Opção inválida.");
+                }
             }
 
-            if (opcao == 1) {
-                try{
-                    System.out.println("\n[Lançamento de Entrega]");
-                    System.out.print("Data (DD/MM/AAAA) ou 'hoje': ");
-                    String dataInput = teclado.next();
-                
-                    LocalDate dataFinal;
-                    if (dataInput.equalsIgnoreCase("hoje")) {
-                        dataFinal = LocalDate.now();
-                    } else {
-                        //usar o formato brasileiro de data ao invés do AAAA-MM-DD
-                        DateTimeFormatter formatoBR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                        //aqui o java transforma o texto da data em uma data real
-                        dataFinal = LocalDate.parse(dataInput, formatoBR);
-                    }
-                    System.out.print("Quantos pacotes entregues com SUCESSO? ");
-                    int suces = teclado.nextInt();
-                    System.out.print("Quantos pacotes FALHOS/DEVOLVIDOS? ");
-                    int fal = teclado.nextInt();
+            //SUB-LOOP = só roda se o usuário estiver logado
+            int opcaoEntrega = 0;
+            while (usuarioLogado != null && opcaoEntrega != 4) {
+                System.out.println("\n--- MONITOR ENVIOS EXTRA ---");
+                System.out.println("Motorista ativo: " + usuarioLogado.getUsername());
+                System.out.println("1. Lançar entregas");
+                System.out.println("2. Ver relatório e quanto falta para Plantina");
+                System.out.println("3. Exportar relatório do mês em PDF");
+                System.out.println("4. Desconectar");
+                System.out.print("Escolha uma opção: ");
 
-                    Entrega entregaDeHoje = new Entrega(dataFinal, suces, fal);
-                    System.out.println("Gravando entrega do dia: " + entregaDeHoje.getData());
-                    repository.salvar(entregaDeHoje);
-
-                } catch(DateTimeParseException e) {
-                    System.out.println("ERRO: Formato de data inválido! Use: DD/MM/AAAA");
-                } catch(InputMismatchException e) {
-                    System.out.println("ERRO: Digite apenas números para sucessos e falhas.");
+                try {
+                    opcaoEntrega = teclado.nextInt();
+                } catch (InputMismatchException e) {
+                    System.out.println("ERRO: Digite apenas números para o menu.");
                     teclado.next();
-                } catch(IllegalArgumentException e){
-                    System.out.println("ERRO DE VALIDAÇÃO: " + e.getMessage());
+                    continue;
                 }
-            } else if (opcao == 2) {
-                carregarERelatar(repository, false);
-            } else if (opcao == 3){
-                carregarERelatar(repository, true);
-            } else if (opcao == 4) {
-                System.out.println("Saindo... Boa rota amanhã!");
-            } else {
-                System.out.println("Opção Inválida.");
+
+                if (opcaoEntrega == 1) {
+                    try{
+                        System.out.println("\n[Lançamento da Entrega]");
+                        System.out.print("Data (DD/MM/AAAA) ou 'hoje': ");
+                        String dataInput = teclado.next();
+
+                        LocalDate dataFinal;
+                        if (dataInput.equalsIgnoreCase("hoje")) {
+                            dataFinal = LocalDate.now();
+                        } else {
+                            DateTimeFormatter formatoBR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                            dataFinal = LocalDate.parse(dataInput, formatoBR);
+                        }
+                        System.out.print("Quantos pacotes entregues com sucesso? ");
+                        int suces = teclado.nextInt();
+                        System.out.print("Quantos pacotes falhos/devolvidos: ");
+                        int fal = teclado.nextInt();
+
+                        Entrega entregaDeHoje = new Entrega(dataFinal, suces, fal);
+                        System.out.println("Gravando entrega no banco de dados...");
+                        entregaRepository.salvar(entregaDeHoje);
+                    } catch(DateTimeParseException e){
+                        System.out.println("ERRO: Formato de data inválido! Use: DD/MM/AAAA");
+                    } catch(InputMismatchException e){
+                        System.out.println("ERRO: Digite apenas números para sucessos e falhas.");
+                        teclado.next();
+                    } catch(IllegalArgumentException e){
+                        System.out.println("ERRO DE VALIDAÇÃO: " + e.getMessage());
+                    }
+                }else if (opcaoEntrega == 2) {
+                    carregarERelatar(entregaRepository, false);
+                }else if (opcaoEntrega == 3) {
+                    carregarERelatar(entregaRepository, true);
+                }else if (opcaoEntrega == 4) {
+                    System.out.println("Desconectando motorista " + usuarioLogado.getUsername() + "...");
+                    usuarioLogado = null; //destrói a sessão e força retorno para o login
+                }else {
+                    System.out.println("Opção inválida!");
+                }
             }
         }
         teclado.close();
