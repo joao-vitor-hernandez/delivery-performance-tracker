@@ -1,48 +1,58 @@
 package repository;
 
-import model.Entrega;
-import java.io.*;
-import java.time.DateTimeException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import model.Entrega;
+
+
 public class EntregaRepository {
-    private static final String CAMINHO_ARQUIVO = "entregas.csv";
+    //método para salvar no banco de dados
+    public void salvar(Entrega entrega){
+        //comando SQL com ? que servem como caixas vazias para proteger contra SQL Injection
+        String sql = "INSERT INTO entregas (data, sucessos, falhas) VALUES (?,?,?)";
 
-    public void salvar (Entrega entrega){
-        try (FileWriter fw = new FileWriter(CAMINHO_ARQUIVO, true);
-        PrintWriter pw = new PrintWriter(fw)) {
+        //abrimos a conexão usando a classe ConexaoSQLite
+        try(Connection conn = ConexaoSQLite.conectar();
+            PreparedStatement pstmt = conn.prepareStatement(sql)){
 
-            pw.println(entrega.getData() + "," + entrega.getSucessos() + "," + entrega.getFalhas());
-            System.out.println("Dados gravados com sucesso!");
-        } catch (IOException e) {
-            System.out.println("ERRO ao salvar no CSV: " + e.getMessage());
+            //preenchemos os ? com os dados da entrega antes de enviar pro banco de dados
+            pstmt.setString(1, entrega.getData().toString());
+            pstmt.setInt(2, entrega.getSucessos());
+            pstmt.setInt(3, entrega.getFalhas());
+
+            pstmt.executeUpdate(); //executa o comando de inserção no banco de dados
+            System.out.println("Dados gravados com sucesso no Banco de Dados!");
+        }catch(SQLException e){
+            System.err.println("ERRO: ao salvar no Banco de Dados: " + e.getMessage());
         }
     }
 
+    //método para buscar todos os registros do banco de dados
     public List<Entrega> buscarTodas(){
         List<Entrega> lista = new ArrayList<>();
+        String sql = "SELECT data, sucessos, falhas FROM entregas";
 
-        try (BufferedReader br = new BufferedReader(new FileReader(CAMINHO_ARQUIVO))){
-            String linha;
-            while ((linha = br.readLine()) != null) {
-                if (linha.trim().isEmpty()) continue;            
-                try{
-                    String[] dados = linha.split(",");
-                    //conversão dos dados em segurança
-                    LocalDate data = LocalDate.parse(dados[0].trim());
-                    int sucesso = Integer.parseInt(dados[1].trim());
-                    int falha = Integer.parseInt(dados[2].trim());                   
-                    
-                    lista.add(new Entrega(data, sucesso, falha));
-                } catch (NumberFormatException | DateTimeException | ArrayIndexOutOfBoundsException e){
-                    //se der algum erro em uma linha, ele cai aqui, avisa e vai pra próxima linha
-                    System.err.println("AVISO: Linha inválida ignorada nos CSV -> " + linha);
-                }
+        try (Connection conn = ConexaoSQLite.conectar();
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery()){ //ResultSet guarda as linhas que o banco de dados devolveu
+
+            //passa linha por linha capturando os dados
+            while (rs.next()) {
+                LocalDate data = LocalDate.parse(rs.getString("data"));
+                int sucesso = rs.getInt("sucessos");
+                int falha = rs.getInt("falhas");
+
+                //transforma a linha do banco de dados em um objeto Entrega e adiciona na lista
+                lista.add(new Entrega(data, sucesso, falha));
             }
-        } catch (IOException e) {
-            // Se o arquivo não existir, retornamos a lista vazia sem crashar
+        }catch (SQLException e){
+            System.err.println("ERRO: ao buscar dados do banco: " + e.getMessage());
         }
         return lista;
     }

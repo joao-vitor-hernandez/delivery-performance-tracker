@@ -46,7 +46,7 @@ public class Principal {
         EntregaRepository repository = new EntregaRepository();
         int opcao = 0;
 
-        while (opcao != 3) {
+        while (opcao != 4) {
             System.out.println("\n--- MONITOR MERCADO ENVIO (META 98%) ---");
             System.out.println("1. Lançar entregas");
             System.out.println("2. Ver relatório e quanto falta para Platina");
