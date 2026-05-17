@@ -15,9 +15,9 @@ import service.SenhaService;
 import java.util.List;
 
 public class Principal {
-    public static void carregarERelatar(EntregaRepository repository, boolean exportarParaPdf){
+    public static void carregarERelatar(EntregaRepository repository, int usuarioId, boolean exportarParaPdf){
         EntregaService service = new EntregaService(repository);
-        List<Entrega> entregaDoMes = service.obterEntregasDoMesAtual();
+        List<Entrega> entregaDoMes = service.obterEntregasDoMesAtual(usuarioId);
 
         if (entregaDoMes.isEmpty()) {
             System.out.println("Nenhum dado disponível para o mês atual.");
@@ -139,7 +139,8 @@ public class Principal {
                     try{
                         System.out.println("\n[Lançamento da Entrega]");
                         System.out.print("Data (DD/MM/AAAA) ou 'hoje': ");
-                        String dataInput = teclado.next();
+                        teclado.nextLine();
+                        String dataInput = teclado.nextLine();
 
                         LocalDate dataFinal;
                         if (dataInput.equalsIgnoreCase("hoje")) {
@@ -153,7 +154,7 @@ public class Principal {
                         System.out.print("Quantos pacotes falhos/devolvidos: ");
                         int fal = teclado.nextInt();
 
-                        Entrega entregaDeHoje = new Entrega(dataFinal, suces, fal);
+                        Entrega entregaDeHoje = new Entrega(usuarioLogado.getId(), dataFinal, suces, fal);
                         System.out.println("Gravando entrega no banco de dados...");
                         entregaRepository.salvar(entregaDeHoje);
                     } catch(DateTimeParseException e){
@@ -165,9 +166,9 @@ public class Principal {
                         System.out.println("ERRO DE VALIDAÇÃO: " + e.getMessage());
                     }
                 }else if (opcaoEntrega == 2) {
-                    carregarERelatar(entregaRepository, false);
+                    carregarERelatar(entregaRepository, usuarioLogado.getId(), false);
                 }else if (opcaoEntrega == 3) {
-                    carregarERelatar(entregaRepository, true);
+                    carregarERelatar(entregaRepository, usuarioLogado.getId(), true);
                 }else if (opcaoEntrega == 4) {
                     System.out.println("Desconectando motorista " + usuarioLogado.getUsername() + "...");
                     usuarioLogado = null; //destrói a sessão e força retorno para o login

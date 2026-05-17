@@ -21,26 +21,30 @@ public class ConexaoSQLite {
 
     //método que cria a tabela caso seja a primeira vez rodando o programa
     public static void criarTabelaSeNaoExistir() {
+        String sqlUsuarios = "CREATE TABLE IF NOT EXISTS usuarios ("
+                    + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    + "username TEXT NOT NULL UNIQUE," // UNIQUE impede dois usuários com o mesmo nome
+                    + "senha_hash TEXT NOT NULL"
+                    + ");";
+
         String sqlEntrega = "CREATE TABLE IF NOT EXISTS entregas ("
                    + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                   + "usuario_id INTEGER NOT NULL,"
                    + "data TEXT NOT NULL,"
                    + "sucessos INTEGER NOT NULL,"
-                   + "falhas INTEGER NOT NULL"
+                   + "falhas INTEGER NOT NULL,"
+                   + "FOREIGN KEY (usuario_id) REFERENCES usuarios(id)"
                    + ");";
-        
-        String sqlUsuarios = "CREATE TABLE IF NOT EXISTS usuarios ("
-                           + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                           + "username TEXT NOT NULL UNIQUE," // UNIQUE impede dois usuários com o mesmo nome
-                           + "senha_hash TEXT NOT NULL"
-                           + ");";
         
         try (Connection conn = conectar();
             Statement stmt = conn.createStatement()) {
-
-            stmt.execute(sqlEntrega); //cria a tabela Entrega
+            
             stmt.execute(sqlUsuarios); //cria a tabela Usuarios
+            stmt.execute(sqlEntrega); //cria a tabela Entrega
+
+            System.out.println("Banco de dados e tabela prontos para uso.");
         } catch (SQLException e){
-            System.err.println("ERRO: ao criar as tabelas: " + e.getMessage());
+            System.err.println("ERRO CRÍTICO: ao iniciar tabelas: " + e.getMessage());
         }
     }
 }

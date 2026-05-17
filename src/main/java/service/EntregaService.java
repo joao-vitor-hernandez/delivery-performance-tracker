@@ -13,8 +13,8 @@ public class EntregaService {
         this.repository = repository;
     }
 
-    public List<Entrega> obterEntregasDoMesAtual(){
-        List<Entrega> todas = repository.buscarTodas();
+    public List<Entrega> obterEntregasDoMesAtual(int usuarioId){
+        List<Entrega> todas = repository.buscarPorUsuario(usuarioId);
         LocalDate hoje = LocalDate.now();
 
         return todas.stream().filter(e -> e.getData().getMonthValue() == hoje.getMonthValue() && e.getData().getYear() == hoje.getYear()).collect(Collectors.toList());
