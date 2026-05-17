@@ -40,6 +40,8 @@ public class Principal {
             }
     }
     public static void main(String[] args) {
+        repository.ConexaoSQLite.criarTabelaSeNaoExistir();
+        
         Scanner teclado = new Scanner(System.in);
         EntregaRepository repository = new EntregaRepository();
         int opcao = 0;
