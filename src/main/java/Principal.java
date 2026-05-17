@@ -6,11 +6,12 @@ import java.util.InputMismatchException; //para erro de números
 import model.Entrega;
 import repository.EntregaRepository;
 import service.EntregaService;
+import service.RelatorioPdfService;
 
 import java.util.List;
 
 public class Principal {
-    public static void carregarERelatar(EntregaRepository repository){
+    public static void carregarERelatar(EntregaRepository repository, boolean exportarParaPdf){
         EntregaService service = new EntregaService(repository);
         List<Entrega> entregaDoMes = service.obterEntregasDoMesAtual();
 
@@ -20,17 +21,22 @@ public class Principal {
         }
             double taxa = service.calcularTaxaSucesso(entregaDoMes);
             int totalGeral = service.getTotalPacotes(entregaDoMes);
+            int faltam = (taxa < 98) ? service.calcularProjecaoPlatina(entregaDoMes, 0.98):0;
 
-            System.out.println("\n--- STATUS ACUMULADO DO MÊS ---");
-            System.out.println("Total de pacotes: " + totalGeral);
-            System.out.printf("Taxa de Sucesso: %.2f%%\n",taxa);
-
-            //lógica dos 98%
-            if (taxa < 98) {
-                int faltam = service.calcularProjecaoPlatina(entregaDoMes, 0.98);
-                System.out.printf("ALERTA: Faltam %d entregas perfeitas para chegar em 98%%!\n", faltam);
+            if (exportarParaPdf) {
+                RelatorioPdfService pdfService = new RelatorioPdfService();
+                pdfService.gerarRelatorioMensal(entregaDoMes, taxa, totalGeral, faltam);
             } else {
-                System.out.println("PARABÉNS: Você está na meta Platina!");
+                System.out.println("\n--- STATUS ACUMULADO DO MÊS ---");
+                System.out.println("Total de pacotes: " + totalGeral);
+                System.out.printf("Taxa de Sucesso: %.2f%%\n",taxa);
+
+                //lógica dos 98%
+                if (taxa < 98) {
+                    System.out.printf("ALERTA: Faltam %d entregas perfeitas para chegar em 98%%!\n", faltam);
+                } else {
+                    System.out.println("PARABÉNS: Você está na meta Platina!");
+                }
             }
     }
     public static void main(String[] args) {
@@ -42,7 +48,8 @@ public class Principal {
             System.out.println("\n--- MONITOR MERCADO ENVIO (META 98%) ---");
             System.out.println("1. Lançar entregas");
             System.out.println("2. Ver relatório e quanto falta para Platina");
-            System.out.println("3. Sair");
+            System.out.println("3. Exportar relatório do mês em PDF");
+            System.out.println("4. Sair");
             System.out.print("Escolha uma opção: ");
             try{
                 opcao = teclado.nextInt();
@@ -85,11 +92,10 @@ public class Principal {
                     System.out.println("ERRO DE VALIDAÇÃO: " + e.getMessage());
                 }
             } else if (opcao == 2) {
-                System.out.println("\n=====================");
-                System.out.println("\n[Relatório Mensal]");
-                System.out.println("=====================");
-                carregarERelatar(repository);
-            } else if (opcao == 3) {
+                carregarERelatar(repository, false);
+            } else if (opcao == 3){
+                carregarERelatar(repository, true);
+            } else if (opcao == 4) {
                 System.out.println("Saindo... Boa rota amanhã!");
             } else {
                 System.out.println("Opção Inválida.");
