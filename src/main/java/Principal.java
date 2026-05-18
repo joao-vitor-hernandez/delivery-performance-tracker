@@ -142,11 +142,11 @@ public class Principal {
                         teclado.nextLine();
                         String dataInput = teclado.nextLine();
 
+                        DateTimeFormatter formatoBR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
                         LocalDate dataFinal;
                         if (dataInput.equalsIgnoreCase("hoje")) {
                             dataFinal = LocalDate.now();
                         } else {
-                            DateTimeFormatter formatoBR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
                             dataFinal = LocalDate.parse(dataInput, formatoBR);
                         }
                         System.out.print("Quantos pacotes entregues com sucesso? ");
@@ -154,9 +154,25 @@ public class Principal {
                         System.out.print("Quantos pacotes falhos/devolvidos: ");
                         int fal = teclado.nextInt();
 
-                        Entrega entregaDeHoje = new Entrega(usuarioLogado.getId(), dataFinal, suces, fal);
-                        System.out.println("Gravando entrega no banco de dados...");
-                        entregaRepository.salvar(entregaDeHoje);
+                        Entrega existente = entregaRepository.buscarPorDataEUsuario(usuarioLogado.getId(), dataFinal);
+                        if (existente != null) {
+                            System.out.println("\nAVISO: Você já lançou dados para a data " + dataFinal.format(formatoBR) + ".");
+                            System.out.println("Deseja ATUALIZAR/SOBRESCREVER os dados dessa data? (S/N): ");
+                            String resposta = teclado.next();
+
+                            if (resposta.trim().equalsIgnoreCase("S")) {
+                                //Cria uma nova entrega usando o ID da antiga para sobrescrever
+                                Entrega entregaAtualizada = new Entrega(existente.getId(), usuarioLogado.getId(), dataFinal, suces, fal);
+                                System.out.println("Atualizando banco de dados...");
+                                entregaRepository.atualizar(entregaAtualizada);
+                            } else {
+                                System.out.println("Lançamento cancelado.");
+                            }
+                        } else {
+                            Entrega entregaDeHoje = new Entrega(usuarioLogado.getId(), dataFinal, suces, fal);
+                            System.out.println("Gravando entrega no banco de dados...");
+                            entregaRepository.salvar(entregaDeHoje);
+                        }
                     } catch(DateTimeParseException e){
                         System.out.println("ERRO: Formato de data inválido! Use: DD/MM/AAAA");
                     } catch(InputMismatchException e){
