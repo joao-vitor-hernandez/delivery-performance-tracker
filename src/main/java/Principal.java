@@ -144,7 +144,7 @@ public class Principal {
 
                         DateTimeFormatter formatoBR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
                         LocalDate dataFinal;
-                        if (dataInput.equalsIgnoreCase("hoje")) {
+                        if (dataInput.trim().equalsIgnoreCase("hoje")) {
                             dataFinal = LocalDate.now();
                         } else {
                             dataFinal = LocalDate.parse(dataInput, formatoBR);
