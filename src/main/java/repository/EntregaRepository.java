@@ -35,24 +35,18 @@ public class EntregaRepository {
     }
 
     //método para buscar todos os registros do banco de dados
-    public List<Entrega> buscarPorUsuario(int usuarioId){
+    public List<Entrega> buscarPorUsuario(int usuarioId, int mes, int ano){
         List<Entrega> lista = new ArrayList<>();
-        String sql = "SELECT id, usuario_id, data, sucessos, falhas FROM entregas WHERE usuario_id = ?";
+        String sql = "SELECT id, usuario_id, data, sucessos, falhas FROM entregas WHERE usuario_id = ? AND data LIKE ?";
 
         try (Connection conn = ConexaoSQLite.conectar();
             PreparedStatement pstmt = conn.prepareStatement(sql)){
                 pstmt.setInt(1, usuarioId);
+                String anoMesPesquisa = String.format("%04d-%02d-%%", ano, mes);
+                pstmt.setString(2, anoMesPesquisa);
 
                 try(ResultSet rs = pstmt.executeQuery()){//ResultSet guarda as linhas que o banco de dados devolveu
-                    while (rs.next()) {
-                        int id = rs.getInt("id");
-                        int userId = rs.getInt("usuario_id");
-                        LocalDate data = LocalDate.parse(rs.getString("data"));
-                        int sucesso = rs.getInt("sucessos");
-                        int falha = rs.getInt("falhas");
-
-                        //transforma a linha do banco de dados em um objeto Entrega e adiciona na lista
-                        lista.add(new Entrega(id, userId, data, sucesso, falha));
+                    while (rs.next()) {lista.add(new Entrega(rs.getInt("id"), rs.getInt("usuario_id"), LocalDate.parse(rs.getString("data")), rs.getInt("sucessos"), rs.getInt("falhas")));
                     }
                 }
             }catch (SQLException e){

@@ -2,7 +2,6 @@ package service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 import model.Entrega;
 import repository.EntregaRepository;
 
@@ -14,10 +13,9 @@ public class EntregaService {
     }
 
     public List<Entrega> obterEntregasDoMesAtual(int usuarioId){
-        List<Entrega> todas = repository.buscarPorUsuario(usuarioId);
         LocalDate hoje = LocalDate.now();
 
-        return todas.stream().filter(e -> e.getData().getMonthValue() == hoje.getMonthValue() && e.getData().getYear() == hoje.getYear()).collect(Collectors.toList());
+        return repository.buscarPorUsuario(usuarioId, hoje.getMonthValue(), hoje.getYear());
     }
     
     public int getTotalPacotes (List<Entrega> entregas){
