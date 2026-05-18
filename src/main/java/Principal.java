@@ -15,9 +15,9 @@ import service.SenhaService;
 import java.util.List;
 
 public class Principal {
-    public static void carregarERelatar(EntregaRepository repository, int usuarioId, boolean exportarParaPdf){
+    public static void carregarERelatar(EntregaRepository repository, Usuario usuarioLogado, boolean exportarParaPdf){
         EntregaService service = new EntregaService(repository);
-        List<Entrega> entregaDoMes = service.obterEntregasDoMesAtual(usuarioId);
+        List<Entrega> entregaDoMes = service.obterEntregasDoMesAtual(usuarioLogado.getId());
 
         if (entregaDoMes.isEmpty()) {
             System.out.println("Nenhum dado disponível para o mês atual.");
@@ -29,7 +29,7 @@ public class Principal {
 
             if (exportarParaPdf) {
                 RelatorioPdfService pdfService = new RelatorioPdfService();
-                pdfService.gerarRelatorioMensal(entregaDoMes, taxa, totalGeral, faltam);
+                pdfService.gerarRelatorioMensal(entregaDoMes, taxa, totalGeral, faltam, usuarioLogado.getUsername());
             } else {
                 System.out.println("\n--- STATUS ACUMULADO DO MÊS ---");
                 System.out.println("Total de pacotes: " + totalGeral);
@@ -166,9 +166,9 @@ public class Principal {
                         System.out.println("ERRO DE VALIDAÇÃO: " + e.getMessage());
                     }
                 }else if (opcaoEntrega == 2) {
-                    carregarERelatar(entregaRepository, usuarioLogado.getId(), false);
+                    carregarERelatar(entregaRepository, usuarioLogado, false);
                 }else if (opcaoEntrega == 3) {
-                    carregarERelatar(entregaRepository, usuarioLogado.getId(), true);
+                    carregarERelatar(entregaRepository, usuarioLogado, true);
                 }else if (opcaoEntrega == 4) {
                     System.out.println("Desconectando motorista " + usuarioLogado.getUsername() + "...");
                     usuarioLogado = null; //destrói a sessão e força retorno para o login

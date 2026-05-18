@@ -16,9 +16,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class RelatorioPdfService {
-    public void gerarRelatorioMensal(List<Entrega> entregas, double taxaSucesso, int totalPacotes, int faltamPlatina) {
+    public void gerarRelatorioMensal(List<Entrega> entregas, double taxaSucesso, int totalPacotes, int faltamPlatina, String username) {
         Document document = new Document();
-        String nomeArquivo = "Relatório_Entregas_" + LocalDate.now().getMonthValue() + "_" + LocalDate.now().getYear() + ".pdf";
+        String nomeArquivo = "Relatório_Entregas_" + username + "_" + LocalDate.now().getMonthValue() + "_" + LocalDate.now().getYear() + ".pdf";
 
         try{
             //Criar PDF organizado na raiz do projeto
