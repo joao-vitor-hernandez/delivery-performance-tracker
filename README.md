@@ -25,12 +25,23 @@ The system allows users to:
 ---
 
 ## 🎨 UI/UX Design (Mobile Concept)
+To envision the project beyond the CLI (Command Line Interface), a high-fidelity prototype was developed using **Figma**. The design focuses on **Dark Mode** for driver comfort during night shifts and ergonomic, single-handed usability in the field.
 
-To envision the project beyond the CLI (Command Line Interface), a high-fidelity prototype was developed using **Figma**. The design focuses on **Dark Mode** for driver comfort during night shifts and quick data entry.
+**[🔗 Click here to view the Interactive Figma Prototype](#)** *(https://www.figma.com/proto/Nq7fWFdKD26ISy8yL7Wquj/delivery-performance-tracker?node-id=16-84&p=f&viewport=1308%2C743%2C0.82&t=nJSqF7z83uk3FQB7-1&scaling=min-zoom&content-scaling=fixed&starting-point-node-id=1%3A1746&page-id=0%3A1)*
 
-| Login Screen | Dashboard (Home) | New Entry | History |
-| :---: | :---: | :---: | :---: |
-| ![Login](assets/login.png) | ![Home](assets/principal.png) | ![Entry](assets/novaEntrega.png) | ![History](assets/historico.png) |
+### Key Features & UX Decisions:
+- **Dynamic Dashboard States:** The main screen adapts visually based on the driver's performance, showing different UI states for "Target Reached" (≥ 98%) versus "Recovery Needed" (< 98%).
+- **Floating Action Menu:** Implemented on the main tab to provide quick access to core actions without cluttering the screen.
+- **Integrated Stopwatch:** A brand new screen designed specifically for drivers to track their route times, addressing a real-world time management need.
+- **Refined Data Flows:** Updated, frictionless interfaces for Login, History viewing, and daily Entry logging.
+
+| Login Screen | Dashboard (Target Reached) | Dashboard (Recovery Needed) |
+| :---: | :---: | :---: |
+| ![Login](assets/loginAtt.png) | ![Home Success](assets/principalAtt.png) | ![Home Alert](assets/principalAtt2.png) |
+
+| New Entry | History Log | Route Stopwatch |
+| :---: | :---: | :---: |
+| ![Entry](assets/novaEntregaAtt.png) | ![History](assets/historicoAtt.png) | ![Stopwatch](assets/cronometro.png) |
 
 ---
 
@@ -68,7 +79,7 @@ This project uses **Apache Maven** for automated dependency management and build
 ### Execution Steps
 ```bash
 # 1. Clone the repository
-git clone [https://github.com/joao-vitor-hernandez/delivery-performance-tracker.git](https://github.com/joao-vitor-hernandez/delivery-performance-tracker.git)
+git clone [[https://github.com/joao-vitor-hernandez/delivery-performance-tracker.git](https://github.com/joao-vitor-hernandez/delivery-performance-tracker.git)]
 cd delivery-performance-tracker
 
 # 2. Compile and download dependencies
@@ -135,7 +146,15 @@ O projeto deixou de ser um script local que lia arquivos de texto básicos (CSV)
 - Relatórios em PDF: Módulo de exportação automatizada para geração de relatórios mensais diagramados e profissionais.
 
 #### 🎨 Design UI/UX
-O projeto evoluiu para um conceito mobile moderno em Dark Mode, focado em usabilidade prática para o dia a dia na rua. O protótipo inclui login social, dashboard de metas com "Olá, Nome" e ferramenta de previsão de entregas necessárias.
+O projeto evoluiu para um conceito mobile moderno em Dark Mode, desenhado no Figma com foco em usabilidade prática e ergonômica para o dia a dia na rua.
+
+🔗 Clique aqui para acessar o Protótipo Interativo no Figma (https://www.figma.com/proto/Nq7fWFdKD26ISy8yL7Wquj/delivery-performance-tracker?node-id=16-84&p=f&viewport=1308%2C743%2C0.82&t=nJSqF7z83uk3FQB7-1&scaling=min-zoom&content-scaling=fixed&starting-point-node-id=1%3A1746&page-id=0%3A1)
+
+Destaques da Interface:
+- Dashboard Dinâmico: Telas principais que se adaptam visualmente caso o motorista esteja acima ou abaixo da meta de 98% (Alertas visuais).
+- Menu Flutuante (FAB): Adicionado à tela principal para facilitar a navegação rápida e com apenas uma mão durante a rotina de entregas.
+- Cronômetro Integrado (Novo): Uma ferramenta nativa para o motorista medir o tempo de suas rotas, agregando valor direto à gestão de tempo operacional.
+- Telas Atualizadas: Refinamento visual nas telas de Login, Histórico e Nova Entrega, garantindo uma jornada de usuário sem atritos.
 
 #### 🏗️ Arquitetura e Engenharia
 - **Model:** Entidades puras (Usuario e Entrega) protegidas por encapsulamento restritivo (princípio Fail-Fast).
