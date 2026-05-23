@@ -27,7 +27,7 @@ The system allows users to:
 ## 🎨 UI/UX Design (Mobile Concept)
 To envision the project beyond the CLI (Command Line Interface), a high-fidelity prototype was developed using **Figma**. The design focuses on **Dark Mode** for driver comfort during night shifts and ergonomic, single-handed usability in the field.
 
-**[🔗 Click here to view the Interactive Figma Prototype](#)** *(https://www.figma.com/proto/Nq7fWFdKD26ISy8yL7Wquj/delivery-performance-tracker?node-id=16-84&p=f&viewport=1308%2C743%2C0.82&t=nJSqF7z83uk3FQB7-1&scaling=min-zoom&content-scaling=fixed&starting-point-node-id=1%3A1746&page-id=0%3A1)*
+**[🔗 Click here to view the Interactive Figma Prototype](https://www.figma.com/proto/Nq7fWFdKD26ISy8yL7Wquj/delivery-performance-tracker?node-id=16-84&p=f&viewport=1308%2C743%2C0.82&t=nJSqF7z83uk3FQB7-1&scaling=min-zoom&content-scaling=fixed&starting-point-node-id=1%3A1746&page-id=0%3A1)**
 
 ### Key Features & UX Decisions:
 - **Dynamic Dashboard States:** The main screen adapts visually based on the driver's performance, showing different UI states for "Target Reached" (≥ 98%) versus "Recovery Needed" (< 98%).
@@ -148,7 +148,7 @@ O projeto deixou de ser um script local que lia arquivos de texto básicos (CSV)
 #### 🎨 Design UI/UX
 O projeto evoluiu para um conceito mobile moderno em Dark Mode, desenhado no Figma com foco em usabilidade prática e ergonômica para o dia a dia na rua.
 
-🔗 Clique aqui para acessar o Protótipo Interativo no Figma (https://www.figma.com/proto/Nq7fWFdKD26ISy8yL7Wquj/delivery-performance-tracker?node-id=16-84&p=f&viewport=1308%2C743%2C0.82&t=nJSqF7z83uk3FQB7-1&scaling=min-zoom&content-scaling=fixed&starting-point-node-id=1%3A1746&page-id=0%3A1)
+[🔗 Clique aqui para acessar o Protótipo Interativo no Figma](https://www.figma.com/proto/Nq7fWFdKD26ISy8yL7Wquj/delivery-performance-tracker?node-id=16-84&p=f&viewport=1308%2C743%2C0.82&t=nJSqF7z83uk3FQB7-1&scaling=min-zoom&content-scaling=fixed&starting-point-node-id=1%3A1746&page-id=0%3A1)
 
 Destaques da Interface:
 - Dashboard Dinâmico: Telas principais que se adaptam visualmente caso o motorista esteja acima ou abaixo da meta de 98% (Alertas visuais).
