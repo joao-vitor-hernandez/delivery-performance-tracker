@@ -1,23 +1,39 @@
 package service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import model.Entrega;
+import repository.EntregaRepository;
 
+@ExtendWith(MockitoExtension.class)
 public class EntregaServiceTest {
+
+    @Mock
+    private EntregaRepository repository;
+
+    @InjectMocks
     private EntregaService entregaService;
+
+    private List<Entrega> entregas;
+    private int usuarioIdExemplo;
 
     @BeforeEach
     void setUp() {
-        // Inicializa o serviço passando null para o repository.
-        // Faremos isso porque os métodos matemáticos testados operam puramente em memória.
-        entregaService = new EntregaService(null);
+        usuarioIdExemplo = 1;
+        entregas = new ArrayList<>();
     }
 
     @Test
@@ -78,5 +94,21 @@ public class EntregaServiceTest {
 
         // Validação: A proteção do seu código deve retornar o número de falhas (20)
         assertEquals(20, pacotesNecessarios, "Se a meta for maior ou igual a 100%, o sistema deve retornar o total de falhas.");
+    }
+
+    @Test
+    @DisplayName("MOCK: Deve buscar as entregas do mês atual simulando o comportamento do banco de dados")
+    void deveObterEntregasDoMesAtualUsandoMock(){
+        entregas.add(new Entrega(usuarioIdExemplo, LocalDate.now(), 50, 0));
+
+        when(repository.buscarPorUsuario(eq(usuarioIdExemplo), anyInt(), anyInt())).thenReturn(entregas);
+
+        List<Entrega> resultado = entregaService.obterEntregasDoMesAtual(usuarioIdExemplo);
+
+        assertNotNull(resultado, "O resultado retornado pelo serviço não pode ser nulo.");
+        assertEquals(1, resultado.size(), "A lista deve conter exatamente 1 entrega simulada pelo mock.");
+        assertEquals(50, entregaService.getTotalPacotes(resultado), "O total de pacotes deve somar 50 conforme configurado.");
+
+        verify(repository, times(1)).buscarPorUsuario(eq(usuarioIdExemplo), anyInt(), anyInt());
     }
 }
