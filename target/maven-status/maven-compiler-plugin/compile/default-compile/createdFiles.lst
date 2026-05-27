@@ -1,3 +1,4 @@
+com\entregas\Application.class
 repository\ConexaoSQLite.class
 model\Entrega.class
 service\EntregaService.class
