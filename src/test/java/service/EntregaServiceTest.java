@@ -83,20 +83,22 @@ public class EntregaServiceTest {
     @Test
     @DisplayName("MOCK: Deve buscar as entregas do mês atual simulando o comportamento do banco de dados")
     void deveObterEntregasDoMesAtualUsandoMock(){
+        // Prepara uma entrega com a data de hoje (garantindo que passe no filter do Service)
         entregas.add(new Entrega(usuarioIdExemplo, LocalDate.now(), 50, 0));
         
-        // CORREÇÃO: Alinhado stubbing com o método real do Spring Data JPA usado no Service
-        // Passamos any() para as datas inicial/final que o método do repositório exige
-        when(repository.findByUsuarioIdAndDataBetween(eq(usuarioIdExemplo), any(LocalDate.class), any(LocalDate.class)))
+        // CORREÇÃO: Configura o mock para responder ao método real chamado pelo Service (findByUsuarioId)
+        when(repository.findByUsuarioId(usuarioIdExemplo))
                 .thenReturn(entregas);
 
+        // Executa a ação
         List<Entrega> resultado = entregaService.obterEntregasDoMesAtual(usuarioIdExemplo);
 
+        // Asserções (Validações)
         assertNotNull(resultado, "O resultado retornado pelo serviço não pode ser nulo.");
         assertEquals(1, resultado.size(), "A lista deve conter exatamente 1 entrega simulada pelo mock.");
         assertEquals(50, entregaService.getTotalPacotes(resultado), "O total de pacotes deve somar 50 conforme configurado.");
 
-        // CORREÇÃO: Verificação do método atualizado
-        verify(repository, times(1)).findByUsuarioIdAndDataBetween(eq(usuarioIdExemplo), any(LocalDate.class), any(LocalDate.class));
+        // CORREÇÃO: Verifica se o método correto foi invocado no repositório
+        verify(repository, times(1)).findByUsuarioId(usuarioIdExemplo);
     }
 }
