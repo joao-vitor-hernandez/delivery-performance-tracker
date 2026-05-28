@@ -1,3 +1,18 @@
-*.class
-*.log
+# --- Banco de Dados e Logs (Segurança) ---
 *.db
+*.log
+
+# --- Compilação do Maven (Arquivos Gerados) ---
+target/
+*.class
+
+# --- Configurações do VS Code / Eclipse ---
+.vscode/
+.settings/
+.classpath
+.project
+.factorypath
+
+# --- Configurações do IntelliJ (Caso use futuramente) ---
+.idea/
+*.iml
