@@ -1,67 +1,59 @@
-import java.time.LocalDate; //Para que o java consiga ver a data do aparelho
+import java.time.LocalDate;
 import java.util.Scanner;
-import java.time.format.DateTimeFormatter; //tradutor de datas
-import java.time.format.DateTimeParseException; //para erro de datas
-import java.util.InputMismatchException; //para erro de números
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.InputMismatchException;
+import java.util.List;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
 import model.Entrega;
 import model.Usuario;
-import repository.ConexaoSQLite;
-import repository.EntregaRepository;
-import repository.UsuarioRepository;
+import repository.UsuarioRepository; // Manteremos até refatorar o usuário
 import service.EntregaService;
 import service.RelatorioPdfService;
 import service.SenhaService;
 
-import java.util.List;
+@SpringBootApplication
+@EnableJpaRepositories(basePackages = "repository")
+@EntityScan(basePackages = "model")
+public class Principal implements CommandLineRunner {
 
-public class Principal {
-    public static void carregarERelatar(EntregaRepository repository, Usuario usuarioLogado, boolean exportarParaPdf){
-        EntregaService service = new EntregaService(repository);
-        List<Entrega> entregaDoMes = service.obterEntregasDoMesAtual(usuarioLogado.getId());
+    // O Spring injeta automaticamente as dependências prontas aqui!
+    private final EntregaService entregaService;
 
-        if (entregaDoMes.isEmpty()) {
-            System.out.println("Nenhum dado disponível para o mês atual.");
-            return;
-        }
-            double taxa = service.calcularTaxaSucesso(entregaDoMes);
-            int totalGeral = service.getTotalPacotes(entregaDoMes);
-            int faltam = (taxa < 98) ? service.calcularProjecaoPlatina(entregaDoMes, 0.98):0;
-
-            if (exportarParaPdf) {
-                RelatorioPdfService pdfService = new RelatorioPdfService();
-                pdfService.gerarRelatorioMensal(entregaDoMes, taxa, totalGeral, faltam, usuarioLogado.getUsername());
-            } else {
-                System.out.println("\n--- STATUS ACUMULADO DO MÊS ---");
-                System.out.println("Total de pacotes: " + totalGeral);
-                System.out.printf("Taxa de Sucesso: %.2f%%\n",taxa);
-
-                //lógica dos 98%
-                if (taxa < 98) {
-                    System.out.printf("ALERTA: Faltam %d entregas perfeitas para chegar em 98%%!\n", faltam);
-                } else {
-                    System.out.println("PARABÉNS: Você está na meta Platina!");
-                }
-            }
+    public Principal(EntregaService entregaService) {
+        this.entregaService = entregaService;
     }
-    public static void main(String[] args) {
-        ConexaoSQLite.criarTabelaSeNaoExistir(); //inicialização do banco de dados
 
-        //DATA SEEDING: criação automatica do usuario admin para testes
+    public static void main(String[] args) {
+        // Liga o motor do Spring Boot
+        SpringApplication.run(Principal.class, args);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        // Todo o fluxo principal do seu menu antigo entra aqui dentro!
+        
+        // DATA SEEDING: criação automática do usuário admin para testes
         UsuarioRepository usuarioRepository = new UsuarioRepository();
         if (usuarioRepository.buscarPorUsername("admin") == null) {
             String senhaHashAdmin = SenhaService.gerarHash("admin");
             usuarioRepository.salvar(new Usuario("admin", senhaHashAdmin));
         }
-        Scanner teclado = new Scanner(System.in);
-        EntregaRepository entregaRepository = new EntregaRepository();
 
+        Scanner teclado = new Scanner(System.in);
         boolean fecharSistemaCompleto = false;
 
-        //LOOP PRINCIPAL
+        // LOOP PRINCIPAL
         while (!fecharSistemaCompleto) {
             Usuario usuarioLogado = null;
 
-            //SUB-LOOP
+            // SUB-LOOP de Autenticação
             while (usuarioLogado == null && !fecharSistemaCompleto) {
                 System.out.println("\n=== ACESSO AO SISTEMA ===");
                 System.out.println("1. Fazer login");
@@ -84,10 +76,7 @@ public class Principal {
                     System.out.print("Senha: ");
                     String senha = teclado.next();
 
-                    //buscar usuário no banco de dados
                     Usuario usuarioBanco = usuarioRepository.buscarPorUsername(user);
-
-                    //valida se o usuário existe e se a senha bate com o Hash
                     if (usuarioBanco != null && SenhaService.verificarSenha(senha, usuarioBanco.getSenhaHash())) {
                         usuarioLogado = usuarioBanco;
                         System.out.println("\nLogin efetuado com sucesso.");
@@ -101,12 +90,11 @@ public class Principal {
                     System.out.print("Digite a senha: ");
                     String novaSenha = teclado.next();
 
-                    //aplica o hash do BCrypt antes de mandar para o repositório
                     String senhaMascarada = SenhaService.gerarHash(novaSenha);
                     Usuario novoUsuario = new Usuario(novoUser, senhaMascarada);
 
                     if (usuarioRepository.salvar(novoUsuario)) {
-                        System.out.println("Cadastro realizado! Uso a opção 1 para entrar.");
+                        System.out.println("Cadastro realizado! Use a opção 1 para entrar.");
                     }
                 } else if (opcaoAuth == 3) {
                     System.out.println("Encerrando o monitor... Até a próxima rota!");
@@ -116,13 +104,13 @@ public class Principal {
                 }
             }
 
-            //SUB-LOOP = só roda se o usuário estiver logado
+            // SUB-LOOP do Motorista = só roda se o usuário estiver logado
             int opcaoEntrega = 0;
             while (usuarioLogado != null && opcaoEntrega != 4) {
                 System.out.println("\n--- MONITOR ENVIOS EXTRA ---");
                 System.out.println("Motorista ativo: " + usuarioLogado.getUsername());
                 System.out.println("1. Lançar entregas");
-                System.out.println("2. Ver relatório e quanto falta para Plantina");
+                System.out.println("2. Ver relatório e quanto falta para Platina");
                 System.out.println("3. Exportar relatório do mês em PDF");
                 System.out.println("4. Desconectar");
                 System.out.print("Escolha uma opção: ");
@@ -136,7 +124,7 @@ public class Principal {
                 }
 
                 if (opcaoEntrega == 1) {
-                    try{
+                    try {
                         System.out.println("\n[Lançamento da Entrega]");
                         System.out.print("Data (DD/MM/AAAA) ou 'hoje': ");
                         teclado.nextLine();
@@ -154,25 +142,14 @@ public class Principal {
                         System.out.print("Quantos pacotes falhos/devolvidos: ");
                         int fal = teclado.nextInt();
 
-                        Entrega existente = entregaRepository.buscarPorDataEUsuario(usuarioLogado.getId(), dataFinal);
-                        if (existente != null) {
-                            System.out.println("\nAVISO: Você já lançou dados para a data " + dataFinal.format(formatoBR) + ".");
-                            System.out.println("Deseja ATUALIZAR/SOBRESCREVER os dados dessa data? (S/N): ");
-                            String resposta = teclado.next();
+                        // Criamos o objeto de entrega provisório
+                        Entrega entregaLancada = new Entrega(usuarioLogado.getId(), dataFinal, suces, fal);
+                        
+                        System.out.println("Processando lançamento no banco de dados...");
+                        // O serviço cuida de verificar se insere ou atualiza de forma transparente!
+                        entregaService.salvarOuAtualizar(entregaLancada);
+                        System.out.println("Dados salvos/atualizados com sucesso!");
 
-                            if (resposta.trim().equalsIgnoreCase("S")) {
-                                //Cria uma nova entrega usando o ID da antiga para sobrescrever
-                                Entrega entregaAtualizada = new Entrega(existente.getId(), usuarioLogado.getId(), dataFinal, suces, fal);
-                                System.out.println("Atualizando banco de dados...");
-                                entregaRepository.atualizar(entregaAtualizada);
-                            } else {
-                                System.out.println("Lançamento cancelado.");
-                            }
-                        } else {
-                            Entrega entregaDeHoje = new Entrega(usuarioLogado.getId(), dataFinal, suces, fal);
-                            System.out.println("Gravando entrega no banco de dados...");
-                            entregaRepository.salvar(entregaDeHoje);
-                        }
                     } catch(DateTimeParseException e){
                         System.out.println("ERRO: Formato de data inválido! Use: DD/MM/AAAA");
                     } catch(InputMismatchException e){
@@ -181,18 +158,47 @@ public class Principal {
                     } catch(IllegalArgumentException e){
                         System.out.println("ERRO DE VALIDAÇÃO: " + e.getMessage());
                     }
-                }else if (opcaoEntrega == 2) {
-                    carregarERelatar(entregaRepository, usuarioLogado, false);
-                }else if (opcaoEntrega == 3) {
-                    carregarERelatar(entregaRepository, usuarioLogado, true);
-                }else if (opcaoEntrega == 4) {
+                } else if (opcaoEntrega == 2) {
+                    carregarERelatar(usuarioLogado, false);
+                } else if (opcaoEntrega == 3) {
+                    carregarERelatar(usuarioLogado, true);
+                } else if (opcaoEntrega == 4) {
                     System.out.println("Desconectando motorista " + usuarioLogado.getUsername() + "...");
-                    usuarioLogado = null; //destrói a sessão e força retorno para o login
-                }else {
+                    usuarioLogado = null;
+                } else {
                     System.out.println("Opção inválida!");
                 }
             }
         }
         teclado.close();
+    }
+
+    // Método auxiliar adaptado para usar o serviço injetado pelo Spring
+    private void carregarERelatar(Usuario usuarioLogado, boolean exportarParaPdf) {
+        List<Entrega> entregaDoMes = entregaService.obterEntregasDoMesAtual(usuarioLogado.getId());
+
+        if (entregaDoMes.isEmpty()) {
+            System.out.println("Nenhum dado disponível para o mês atual.");
+            return;
+        }
+        
+        double taxa = entregaService.calcularTaxaSucesso(entregaDoMes);
+        int totalGeral = entregaService.getTotalPacotes(entregaDoMes);
+        int faltam = (taxa < 98) ? entregaService.calcularProjecaoPlatina(entregaDoMes, 0.98) : 0;
+
+        if (exportarParaPdf) {
+            RelatorioPdfService pdfService = new RelatorioPdfService();
+            pdfService.gerarRelatorioMensal(entregaDoMes, taxa, totalGeral, faltam, usuarioLogado.getUsername());
+        } else {
+            System.out.println("\n--- STATUS ACUMULADO DO MÊS ---");
+            System.out.println("Total de pacotes: " + totalGeral);
+            System.out.printf("Taxa de Sucesso: %.2f%%\n", taxa);
+            
+            if (taxa < 98) {
+                System.out.printf("ALERTA: Faltam %d entregas perfeitas para chegar em 98%%!\n", faltam);
+            } else {
+                System.out.println("PARABÉNS: Você está na meta Platina!");
+            }
+        }
     }
 }
