@@ -2,9 +2,12 @@ package service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 import model.Entrega;
 import repository.EntregaRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class EntregaService {
     private final EntregaRepository repository;
 
@@ -14,8 +17,22 @@ public class EntregaService {
 
     public List<Entrega> obterEntregasDoMesAtual(int usuarioId){
         LocalDate hoje = LocalDate.now();
+        int mesAtual = hoje.getMonthValue();
+        int anoAtual = hoje.getYear();
 
-        return repository.buscarPorUsuario(usuarioId, hoje.getMonthValue(), hoje.getYear());
+        return repository.findByUsuarioId(usuarioId).stream()
+                .filter(e -> e.getData().getMonthValue() == mesAtual && e.getData().getYear() == anoAtual)
+                .collect(Collectors.toList());
+    }
+    
+    public Entrega salvarOuAtualizar(Entrega entrega){
+        Entrega entregaExistente = repository.findByUsuarioIdAndData(entrega.getUsuarioId(), entrega.getData());
+        if(entregaExistente != null){
+            entregaExistente.setSucessos(entrega.getSucessos());
+            entregaExistente.setFalhas(entrega.getFalhas());
+            return repository.save(entregaExistente);
+        }
+        return repository.save(entrega);
     }
     
     public int getTotalPacotes (List<Entrega> entregas){
