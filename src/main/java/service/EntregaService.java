@@ -15,7 +15,7 @@ public class EntregaService {
         this.repository = repository;
     }
 
-    public List<Entrega> obterEntregasDoMesAtual(int usuarioId){
+    public List<Entrega> obterEntregasDoMesAtual(Long usuarioId){
         LocalDate hoje = LocalDate.now();
         int mesAtual = hoje.getMonthValue();
         int anoAtual = hoje.getYear();
@@ -34,7 +34,7 @@ public class EntregaService {
         }
         return repository.save(entrega);
     }
-    
+
     public int getTotalPacotes (List<Entrega> entregas){
         return calcularTotais(entregas)[2];
     }

@@ -13,7 +13,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import model.Entrega;
 import model.Usuario;
-import repository.UsuarioRepository; // Manteremos até refatorar o usuário
+import repository.UsuarioRepository; 
 import service.EntregaService;
 import service.RelatorioPdfService;
 import service.SenhaService;
@@ -23,11 +23,14 @@ import service.SenhaService;
 @EntityScan(basePackages = "model")
 public class Principal implements CommandLineRunner {
 
-    // O Spring injeta automaticamente as dependências prontas aqui!
+    // O Spring injeta automaticamente as dependências prontas via construtor!
     private final EntregaService entregaService;
+    private final UsuarioRepository usuarioRepository;
 
-    public Principal(EntregaService entregaService) {
+    // Construtor unificado para injeção de dependências do Spring
+    public Principal(EntregaService entregaService, UsuarioRepository usuarioRepository) {
         this.entregaService = entregaService;
+        this.usuarioRepository = usuarioRepository;
     }
 
     public static void main(String[] args) {
@@ -37,13 +40,11 @@ public class Principal implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Todo o fluxo principal do seu menu antigo entra aqui dentro!
         
-        // DATA SEEDING: criação automática do usuário admin para testes
-        UsuarioRepository usuarioRepository = new UsuarioRepository();
-        if (usuarioRepository.buscarPorUsername("admin") == null) {
+        // DATA SEEDING: Uso do findByUsername e save() do Spring Data JPA
+        if (usuarioRepository.findByUsername("admin") == null) {
             String senhaHashAdmin = SenhaService.gerarHash("admin");
-            usuarioRepository.salvar(new Usuario("admin", senhaHashAdmin));
+            usuarioRepository.save(new Usuario("admin", senhaHashAdmin));
         }
 
         Scanner teclado = new Scanner(System.in);
@@ -76,7 +77,8 @@ public class Principal implements CommandLineRunner {
                     System.out.print("Senha: ");
                     String senha = teclado.next();
 
-                    Usuario usuarioBanco = usuarioRepository.buscarPorUsername(user);
+                    // Atualizado para usar o padrão findByUsername do JpaRepository
+                    Usuario usuarioBanco = usuarioRepository.findByUsername(user);
                     if (usuarioBanco != null && SenhaService.verificarSenha(senha, usuarioBanco.getSenhaHash())) {
                         usuarioLogado = usuarioBanco;
                         System.out.println("\nLogin efetuado com sucesso.");
@@ -92,10 +94,15 @@ public class Principal implements CommandLineRunner {
 
                     String senhaMascarada = SenhaService.gerarHash(novaSenha);
                     Usuario novoUsuario = new Usuario(novoUser, senhaMascarada);
-
-                    if (usuarioRepository.salvar(novoUsuario)) {
+                    
+                    try {
+                        // Atualizado para usar o método save() padrão do Spring Data JPA
+                        usuarioRepository.save(novoUsuario);
                         System.out.println("Cadastro realizado! Use a opção 1 para entrar.");
+                    } catch (Exception e) {
+                        System.out.println("ERRO ao cadastrar motorista: Usuário já existe ou dados inválidos.");
                     }
+                    
                 } else if (opcaoAuth == 3) {
                     System.out.println("Encerrando o monitor... Até a próxima rota!");
                     fecharSistemaCompleto = true;
@@ -137,33 +144,31 @@ public class Principal implements CommandLineRunner {
                         } else {
                             dataFinal = LocalDate.parse(dataInput, formatoBR);
                         }
+
                         System.out.print("Quantos pacotes entregues com sucesso? ");
                         int suces = teclado.nextInt();
+
                         System.out.print("Quantos pacotes falhos/devolvidos: ");
                         int fal = teclado.nextInt();
 
-                        // Criamos o objeto de entrega provisório
+                        // O construtor de Entrega agora recebe o ID como Long de forma nativa
                         Entrega entregaLancada = new Entrega(usuarioLogado.getId(), dataFinal, suces, fal);
-                        
+
                         System.out.println("Processando lançamento no banco de dados...");
-                        // O serviço cuida de verificar se insere ou atualiza de forma transparente!
                         entregaService.salvarOuAtualizar(entregaLancada);
                         System.out.println("Dados salvos/atualizados com sucesso!");
-
                     } catch(DateTimeParseException e){
                         System.out.println("ERRO: Formato de data inválido! Use: DD/MM/AAAA");
                     } catch(InputMismatchException e){
                         System.out.println("ERRO: Digite apenas números para sucessos e falhas.");
                         teclado.next();
-                    } catch(IllegalArgumentException e){
-                        System.out.println("ERRO DE VALIDAÇÃO: " + e.getMessage());
                     }
                 } else if (opcaoEntrega == 2) {
                     carregarERelatar(usuarioLogado, false);
                 } else if (opcaoEntrega == 3) {
                     carregarERelatar(usuarioLogado, true);
                 } else if (opcaoEntrega == 4) {
-                    System.out.println("Desconectando motorista " + usuarioLogado.getUsername() + "...");
+                    System.out.println("\nUsuário " + usuarioLogado.getUsername() + " desconectado.");
                     usuarioLogado = null;
                 } else {
                     System.out.println("Opção inválida!");
@@ -173,7 +178,7 @@ public class Principal implements CommandLineRunner {
         teclado.close();
     }
 
-    // Método auxiliar adaptado para usar o serviço injetado pelo Spring
+    // Método auxiliar adaptado com o ID do Usuário como Long
     private void carregarERelatar(Usuario usuarioLogado, boolean exportarParaPdf) {
         List<Entrega> entregaDoMes = entregaService.obterEntregasDoMesAtual(usuarioLogado.getId());
 
@@ -195,9 +200,10 @@ public class Principal implements CommandLineRunner {
             System.out.printf("Taxa de Sucesso: %.2f%%\n", taxa);
             
             if (taxa < 98) {
-                System.out.printf("ALERTA: Faltam %d entregas perfeitas para chegar em 98%%!\n", faltam);
+                System.out.println("Alerta: Você está ABAIXO da meta Platina (98%).");
+                System.out.println("Faltam aproximadamente " + faltam + " entregas 100% limpas para recuperar seu nível.");
             } else {
-                System.out.println("PARABÉNS: Você está na meta Platina!");
+                System.out.println("Parabéns! Você está Mantendo a Meta Corporativa de Ouro/Platina.");
             }
         }
     }

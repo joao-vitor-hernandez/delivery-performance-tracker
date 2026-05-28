@@ -1,17 +1,17 @@
 package repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-import model.Entrega;
 import java.time.LocalDate;
 import java.util.List;
+import model.Entrega;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EntregaRepository extends JpaRepository<Entrega, Long> {
+    
+    List<Entrega> findByUsuarioId(Long usuarioId);
 
-    // O Spring gera o SQL automático: SELECT * FROM tb_entrega WHERE usuario_id = ? AND data = ?
-    Entrega findByUsuarioIdAndData(int usuarioId, LocalDate data);
+    Entrega findByUsuarioIdAndData(Long usuarioId, LocalDate data);
 
-    // O Spring gera o SQL automático para filtrar por usuário
-    List<Entrega> findByUsuarioId(int usuarioId);
+    List<Entrega> findByUsuarioIdAndDataBetween(Long usuarioId, LocalDate dataInicio, LocalDate dataFim);
 }

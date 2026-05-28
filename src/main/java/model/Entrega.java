@@ -17,7 +17,7 @@ public class Entrega {
     private Long id;
 
     @Column(name = "usuario_id")
-    private int usuarioId;
+    private Long usuarioId;
 
     private LocalDate data;
     private int sucessos;
@@ -25,7 +25,7 @@ public class Entrega {
 
     public Entrega(){}
     // 2. Construtor completo (O botão que "imprime" uma ficha nova preenchida)
-    public Entrega(Long id, int usuarioId, LocalDate data, int sucessos, int falhas) {
+    public Entrega(Long id, Long usuarioId, LocalDate data, int sucessos, int falhas) {
         validarValores(sucessos,falhas);
         this.id = id;
         this.usuarioId = usuarioId;
@@ -35,7 +35,7 @@ public class Entrega {
     }
 
     //3. Construtor simples
-    public Entrega(int usuarioId, LocalDate data, int sucessos, int falhas){
+    public Entrega(Long usuarioId, LocalDate data, int sucessos, int falhas){
         validarValores(sucessos, falhas);
         this.usuarioId = usuarioId;
         this.data = data;
@@ -52,8 +52,8 @@ public class Entrega {
     public Long getId(){ return id;}
     public void setId(Long id) {this.id = id;}
 
-    public int getUsuarioId() {return usuarioId;}
-    public void setUsuarioId(int usuarioId) {this.usuarioId = usuarioId;}
+    public Long getUsuarioId() {return usuarioId;}
+    public void setUsuarioId(Long usuarioId) {this.usuarioId = usuarioId;}
 
     public LocalDate getData() {return this.data;}
     public void setData(LocalDate data) {this.data = data;}
