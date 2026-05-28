@@ -1,4 +1,5 @@
 com\entregas\Application.class
+com\entregas\controller\HomeController.class
 repository\ConexaoSQLite.class
 model\Entrega.class
 service\EntregaService.class
