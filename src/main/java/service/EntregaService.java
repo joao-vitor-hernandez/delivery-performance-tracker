@@ -66,4 +66,14 @@ public class EntregaService {
         double faltam = (metaDesejada*totalGeral-totalSucesso)/(1-metaDesejada);
         return Math.max(0,(int) Math.ceil(faltam));
     }
+
+    public Entrega salvarEntrega(Entrega entrega) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'salvarEntrega'");
+    }
+
+    public List<Entrega> buscarPorUsuario(Long usuarioId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'buscarPorUsuario'");
+    }
 }
