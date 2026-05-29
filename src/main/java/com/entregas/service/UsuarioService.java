@@ -1,10 +1,12 @@
-package service;
+package com.entregas.service;
 
-import model.Usuario;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import repository.UsuarioRepository;
+
+import com.entregas.model.Usuario;
+import com.entregas.repository.UsuarioRepository;
+
 import java.util.Optional;
 
 @Service

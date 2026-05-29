@@ -1,11 +1,12 @@
-package controller;
+package com.entregas.controller;
 
-import model.Usuario;
-import service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.entregas.model.Usuario;
+import com.entregas.service.UsuarioService;
 
 @RestController
 @RequestMapping("/api/usuarios")

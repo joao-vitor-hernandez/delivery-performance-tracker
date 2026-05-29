@@ -1,4 +1,4 @@
-package repository;
+package com.entregas.repository;
 
 import java.sql.Statement;
 import java.sql.Connection;

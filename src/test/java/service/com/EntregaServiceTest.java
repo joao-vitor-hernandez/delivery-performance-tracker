@@ -1,4 +1,4 @@
-package service;
+package service.com;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -12,11 +12,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.entregas.model.Entrega;
+import com.entregas.repository.EntregaRepository;
+import com.entregas.service.EntregaService;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import model.Entrega;
-import repository.EntregaRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class EntregaServiceTest {

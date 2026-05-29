@@ -1,4 +1,4 @@
-package service;
+package service.com;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -14,8 +14,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import model.Usuario;
-import repository.UsuarioRepository;
+import com.entregas.model.Usuario;
+import com.entregas.repository.UsuarioRepository;
+import com.entregas.service.UsuarioService;
 
 @ExtendWith(MockitoExtension.class)
 public class UsuarioServiceTest {

@@ -1,10 +1,11 @@
 package com.entregas.controller;
 
-import model.Entrega;
-import service.EntregaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.entregas.model.Entrega;
+import com.entregas.service.EntregaService;
 
 import java.util.List;
 

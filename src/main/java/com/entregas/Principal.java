@@ -1,3 +1,4 @@
+package com.entregas;
 import java.time.LocalDate;
 import java.util.Scanner;
 import java.time.format.DateTimeFormatter;
@@ -12,16 +13,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-import model.Entrega;
-import model.Usuario;
-import repository.UsuarioRepository; 
-import service.EntregaService;
-import service.RelatorioPdfService;
-import service.UsuarioService;
+import com.entregas.model.Entrega;
+import com.entregas.model.Usuario;
+import com.entregas.repository.UsuarioRepository;
+import com.entregas.service.EntregaService;
+import com.entregas.service.RelatorioPdfService;
+import com.entregas.service.UsuarioService;
 
 @SpringBootApplication
-@EnableJpaRepositories(basePackages = "repository")
-@EntityScan(basePackages = "model")
+@EnableJpaRepositories(basePackages = "com.entregas.repository")
+@EntityScan(basePackages = "com.entregas.model")
 public class Principal implements CommandLineRunner {
 
     private final EntregaService entregaService;

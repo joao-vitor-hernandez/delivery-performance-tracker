@@ -1,11 +1,13 @@
-package service;
+package com.entregas.service;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
-import model.Entrega;
-import repository.EntregaRepository;
+
 import org.springframework.stereotype.Service;
+
+import com.entregas.model.Entrega;
+import com.entregas.repository.EntregaRepository;
 
 @Service
 public class EntregaService {

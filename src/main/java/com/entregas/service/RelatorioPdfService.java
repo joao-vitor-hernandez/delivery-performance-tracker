@@ -1,12 +1,12 @@
-package service;
+package com.entregas.service;
 
+import com.entregas.model.Entrega;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Font;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
-import model.Entrega;
 
 import java.awt.Color;
 import java.io.FileOutputStream;
