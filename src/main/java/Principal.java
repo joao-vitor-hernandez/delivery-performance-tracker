@@ -4,6 +4,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -16,21 +17,22 @@ import model.Usuario;
 import repository.UsuarioRepository; 
 import service.EntregaService;
 import service.RelatorioPdfService;
-import service.SenhaService;
+import service.UsuarioService;
 
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = "repository")
 @EntityScan(basePackages = "model")
 public class Principal implements CommandLineRunner {
 
-    // O Spring injeta automaticamente as dependências prontas via construtor!
     private final EntregaService entregaService;
     private final UsuarioRepository usuarioRepository;
+    private final UsuarioService usuarioService; // INJEÇÃO DA NOVA SERVICE
 
     // Construtor unificado para injeção de dependências do Spring
-    public Principal(EntregaService entregaService, UsuarioRepository usuarioRepository) {
+    public Principal(EntregaService entregaService, UsuarioRepository usuarioRepository, UsuarioService usuarioService) {
         this.entregaService = entregaService;
         this.usuarioRepository = usuarioRepository;
+        this.usuarioService = usuarioService;
     }
 
     public static void main(String[] args) {
@@ -41,10 +43,10 @@ public class Principal implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         
-        // DATA SEEDING: Uso do findByUsername e save() do Spring Data JPA
-        if (usuarioRepository.findByUsername("admin") == null) {
-            String senhaHashAdmin = SenhaService.gerarHash("admin");
-            usuarioRepository.save(new Usuario("admin", senhaHashAdmin));
+        // DATA SEEDING: Uso inteligente do Optional
+        if (usuarioRepository.findByUsername("admin").isEmpty()) {
+            // O próprio UsuarioService já aplica o BCrypt internamente no momento do cadastro!
+            usuarioService.cadastrarUsuario(new Usuario("admin", "admin"));
         }
 
         Scanner teclado = new Scanner(System.in);
@@ -77,14 +79,16 @@ public class Principal implements CommandLineRunner {
                     System.out.print("Senha: ");
                     String senha = teclado.next();
 
-                    // Atualizado para usar o padrão findByUsername do JpaRepository
-                    Usuario usuarioBanco = usuarioRepository.findByUsername(user);
-                    if (usuarioBanco != null && SenhaService.verificarSenha(senha, usuarioBanco.getSenhaHash())) {
-                        usuarioLogado = usuarioBanco;
+                    // Utilizamos o método de login limpo do UsuarioService, resolvendo o erro do Optional!
+                    Optional<Usuario> usuarioOpt = usuarioService.login(user, senha);
+
+                    if (usuarioOpt.isPresent()) {
+                        usuarioLogado = usuarioOpt.get(); // Retiramos da caixa protetora com sucesso
                         System.out.println("\nLogin efetuado com sucesso.");
                     } else {
                         System.out.println("\n ERRO: Usuário ou senha inválidos.");
                     }
+
                 } else if(opcaoAuth == 2) {
                     System.out.println("\n[Cadastro de Novo Motorista]");
                     System.out.print("Digite o usuário desejado: ");
@@ -92,15 +96,16 @@ public class Principal implements CommandLineRunner {
                     System.out.print("Digite a senha: ");
                     String novaSenha = teclado.next();
 
-                    String senhaMascarada = SenhaService.gerarHash(novaSenha);
-                    Usuario novoUsuario = new Usuario(novoUser, senhaMascarada);
+                    // A senha vai limpa para o Usuario, o Service mascara ela antes de salvar!
+                    Usuario novoUsuario = new Usuario(novoUser, novaSenha);
                     
                     try {
-                        // Atualizado para usar o método save() padrão do Spring Data JPA
-                        usuarioRepository.save(novoUsuario);
+                        usuarioService.cadastrarUsuario(novoUsuario);
                         System.out.println("Cadastro realizado! Use a opção 1 para entrar.");
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("ERRO ao cadastrar motorista: " + e.getMessage());
                     } catch (Exception e) {
-                        System.out.println("ERRO ao cadastrar motorista: Usuário já existe ou dados inválidos.");
+                        System.out.println("ERRO ao cadastrar motorista: dados inválidos.");
                     }
                     
                 } else if (opcaoAuth == 3) {
@@ -139,6 +144,7 @@ public class Principal implements CommandLineRunner {
 
                         DateTimeFormatter formatoBR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
                         LocalDate dataFinal;
+
                         if (dataInput.trim().equalsIgnoreCase("hoje")) {
                             dataFinal = LocalDate.now();
                         } else {
@@ -151,12 +157,11 @@ public class Principal implements CommandLineRunner {
                         System.out.print("Quantos pacotes falhos/devolvidos: ");
                         int fal = teclado.nextInt();
 
-                        // O construtor de Entrega agora recebe o ID como Long de forma nativa
                         Entrega entregaLancada = new Entrega(usuarioLogado.getId(), dataFinal, suces, fal);
-
                         System.out.println("Processando lançamento no banco de dados...");
                         entregaService.salvarOuAtualizar(entregaLancada);
                         System.out.println("Dados salvos/atualizados com sucesso!");
+                        
                     } catch(DateTimeParseException e){
                         System.out.println("ERRO: Formato de data inválido! Use: DD/MM/AAAA");
                     } catch(InputMismatchException e){
@@ -178,10 +183,9 @@ public class Principal implements CommandLineRunner {
         teclado.close();
     }
 
-    // Método auxiliar adaptado com o ID do Usuário como Long
     private void carregarERelatar(Usuario usuarioLogado, boolean exportarParaPdf) {
         List<Entrega> entregaDoMes = entregaService.obterEntregasDoMesAtual(usuarioLogado.getId());
-
+        
         if (entregaDoMes.isEmpty()) {
             System.out.println("Nenhum dado disponível para o mês atual.");
             return;
@@ -190,7 +194,7 @@ public class Principal implements CommandLineRunner {
         double taxa = entregaService.calcularTaxaSucesso(entregaDoMes);
         int totalGeral = entregaService.getTotalPacotes(entregaDoMes);
         int faltam = (taxa < 98) ? entregaService.calcularProjecaoPlatina(entregaDoMes, 0.98) : 0;
-
+        
         if (exportarParaPdf) {
             RelatorioPdfService pdfService = new RelatorioPdfService();
             pdfService.gerarRelatorioMensal(entregaDoMes, taxa, totalGeral, faltam, usuarioLogado.getUsername());
