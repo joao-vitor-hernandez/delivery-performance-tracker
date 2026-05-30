@@ -13,14 +13,17 @@ import com.entregas.service.UsuarioService;
 public class UsuarioController {
     
     @Autowired
-    private UsuarioService usuarioService;
+    private final UsuarioService usuarioService;
+    public UsuarioController(UsuarioService usuarioService){
+        this.usuarioService = usuarioService;
+    }
 
     //Endpoint para criar novo usuário
     //Rota: POST http://localhost:8080/api/usuarios/registrar
     @PostMapping("/registrar")
-    public ResponseEntity<String> registrarUsuario(@RequestBody Usuario usuario) {
+    public ResponseEntity<String> registrarUsuario(@RequestBody Usuario novoUsuario) {
         try {
-            usuarioService.cadastrarUsuario(usuario);
+            usuarioService.cadastrarUsuario(novoUsuario);
             return ResponseEntity.status(HttpStatus.CREATED).body("Usuário registrado com sucesso!");
         } catch (IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

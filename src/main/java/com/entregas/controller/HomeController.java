@@ -1,12 +1,15 @@
 package com.entregas.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/")
 public class HomeController {
-    @GetMapping("/")
-    public String boasVindas(){
-        return "API do Monitor de Desempenho de Entregas (Nível Platina) rodando com sucesso.";
+
+    @GetMapping
+    public String status() {
+        return "API do Monitor de Entregas está Online! 📦";
     }
 }
