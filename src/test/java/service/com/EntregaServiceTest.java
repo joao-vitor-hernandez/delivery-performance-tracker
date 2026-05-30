@@ -42,7 +42,7 @@ public class EntregaServiceTest {
     @DisplayName("Deve calcular a taxa de sucesso corretamente com uma lista de entregas")
     void deveCalcularTaxaSucessoComSucesso() {
         List<Entrega> entregas = new ArrayList<>();
-        Entrega entrega1 = new Entrega(1L, LocalDate.now(), 95, 5); 
+        Entrega entrega1 = new Entrega(1L, null, LocalDate.now(), 95, 5); 
         entregas.add(entrega1);
 
         double taxaCalculada = entregaService.calcularTaxaSucesso(entregas);
@@ -53,7 +53,7 @@ public class EntregaServiceTest {
     @DisplayName("Deve retornar zero se o total de pacotes na lista for zero")
     void deveTratarDivisaoPorZeroAoCalcularTaxa() {
         List<Entrega> entregas = new ArrayList<>();
-        Entrega entregaVazia = new Entrega(1L, LocalDate.now(), 0, 0);
+        Entrega entregaVazia = new Entrega(1L, null, LocalDate.now(), 0, 0);
         entregas.add(entregaVazia);
 
         double taxaCalculada = entregaService.calcularTaxaSucesso(entregas);
@@ -64,7 +64,7 @@ public class EntregaServiceTest {
     @DisplayName("STRESS: Deve calcular corretamente a projeção para meta de 98% (Nível Platina)")
     void deveCalcularProjecaoPlatinaComSucesso() {
         List<Entrega> entregas = new ArrayList<>();
-        Entrega entregaStress = new Entrega(1L, LocalDate.now(), 80, 20);
+        Entrega entregaStress = new Entrega(1L, null,LocalDate.now(), 80, 20);
         entregas.add(entregaStress);
 
         int pacotesNecessarios = entregaService.calcularProjecaoPlatina(entregas, 0.98);
@@ -75,7 +75,7 @@ public class EntregaServiceTest {
     @DisplayName("STRESS: Deve retornar o total de falhas se a meta inserida for de 100% ou mais")
     void deveTratarMetaImpossivelNaProjecao() {
         List<Entrega> entregas = new ArrayList<>();
-        Entrega entregaStress = new Entrega(1L, LocalDate.now(), 80, 20);
+        Entrega entregaStress = new Entrega(1L, null, LocalDate.now(), 80, 20);
         entregas.add(entregaStress);
 
         int pacotesNecessarios = entregaService.calcularProjecaoPlatina(entregas, 1.0);
@@ -86,7 +86,7 @@ public class EntregaServiceTest {
     @DisplayName("MOCK: Deve buscar as entregas do mês atual simulando o comportamento do banco de dados")
     void deveObterEntregasDoMesAtualUsandoMock(){
         // Prepara uma entrega com a data de hoje (garantindo que passe no filter do Service)
-        entregas.add(new Entrega(usuarioIdExemplo, LocalDate.now(), 50, 0));
+        entregas.add(new Entrega(usuarioIdExemplo, null, LocalDate.now(), 50, 0));
         
         // CORREÇÃO: Configura o mock para responder ao método real chamado pelo Service (findByUsuarioId)
         when(repository.findByUsuarioId(usuarioIdExemplo))
