@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.*;
 
 import com.entregas.model.Entrega;
 import com.entregas.service.EntregaService;
+import com.entregas.dto.request.EntregaRequestDTO;
+import com.entregas.dto.response.EntregaResponseDTO;
+import com.entregas.mapper.EntregaMapper;
 
 import java.util.List;
 
@@ -19,22 +22,25 @@ public class EntregaController {
     }
 
     @PostMapping
-    public ResponseEntity<Entrega> registrarEntrega(@RequestBody Entrega entrega){
+    public ResponseEntity<EntregaResponseDTO> registrarEntrega(@RequestBody EntregaRequestDTO dto){
         try {
-            Entrega novaEntrega = entregaService.salvarOuAtualizar(entrega);
+            Entrega entrega = EntregaMapper.toEntity(dto);
+            Entrega entregaSalva = entregaService.salvarOuAtualizar(entrega);
+            EntregaResponseDTO responseDTO = EntregaMapper.toResponseDTO(entregaSalva);
             // Retorna o HTTP status 201 (Created)
-            return new ResponseEntity<>(novaEntrega, HttpStatus.CREATED);
+            return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
         } catch (IllegalArgumentException e){
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<List<Entrega>> listarPorUsuario(@PathVariable Long usuarioId){
+    public ResponseEntity<List<EntregaResponseDTO>> listarPorUsuario(@PathVariable Long usuarioId){
         try{ 
             List<Entrega> entregas = entregaService.obterEntregasDoMesAtual(usuarioId);
+            List<EntregaResponseDTO> response = entregas.stream().map(EntregaMapper::toResponseDTO).toList();
             // Retorna HTTP Status 200 (OK)
-            return new ResponseEntity<>(entregas, HttpStatus.OK);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (IllegalArgumentException e){
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
