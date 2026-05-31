@@ -23,39 +23,25 @@ public class EntregaController {
     }
 
     @PostMapping
-    public ResponseEntity<EntregaResponseDTO> registrarEntrega(@Valid@RequestBody EntregaRequestDTO dto){
-        try {
-            Entrega entrega = EntregaMapper.toEntity(dto);
-            Entrega entregaSalva = entregaService.salvarOuAtualizar(entrega);
-            EntregaResponseDTO responseDTO = EntregaMapper.toResponseDTO(entregaSalva);
-            // Retorna o HTTP status 201 (Created)
-            return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<EntregaResponseDTO> registrarEntrega(@Valid @RequestBody EntregaRequestDTO dto){
+        
+        Entrega entrega = EntregaMapper.toEntity(dto);
+        Entrega entregaSalva = entregaService.salvarOuAtualizar(entrega);
+        EntregaResponseDTO responseDTO = EntregaMapper.toResponseDTO(entregaSalva);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
     @GetMapping("/usuario/{usuarioId}")
     public ResponseEntity<List<EntregaResponseDTO>> listarPorUsuario(@PathVariable Long usuarioId){
-        try{ 
-            List<Entrega> entregas = entregaService.obterEntregasDoMesAtual(usuarioId);
-            List<EntregaResponseDTO> response = entregas.stream().map(EntregaMapper::toResponseDTO).toList();
-            // Retorna HTTP Status 200 (OK)
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (IllegalArgumentException e){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+        List<Entrega> entregas = entregaService.obterEntregasDoMesAtual(usuarioId);
+        List<EntregaResponseDTO> response = entregas.stream().map(EntregaMapper::toResponseDTO).toList();
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/usuario/{usuarioId}/projecao")
     public ResponseEntity<Integer> obterProjecaoPlatina(@PathVariable Long usuarioId){
-        try {
-            List<Entrega> entregas = entregaService.obterEntregasDoMesAtual(usuarioId);
-            int entregasFaltantes = entregaService.calcularProjecaoPlatina(entregas, 0.98);
-            //Retorna HTTP Status 200 (OK)
-            return new ResponseEntity<>(entregasFaltantes, HttpStatus.OK);
-        } catch (IllegalArgumentException e){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+        List<Entrega> entregas = entregaService.obterEntregasDoMesAtual(usuarioId);
+        int entregasFaltantes = entregaService.calcularProjecaoPlatina(entregas, 0.98);
+        return ResponseEntity.ok(entregasFaltantes);
     }
 }

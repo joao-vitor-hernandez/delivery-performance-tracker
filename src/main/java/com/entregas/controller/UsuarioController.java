@@ -27,13 +27,10 @@ public class UsuarioController {
     //Rota: POST http://localhost:8080/api/usuarios/registrar
     @PostMapping("/registrar")
     public ResponseEntity<UsuarioResponseDTO> registrarUsuario(@Valid @RequestBody UsuarioRequestDTO dto) {
-        try {
-            Usuario usuario = UsuarioMapper.toEntity(dto);
-            Usuario usuarioSalvo = usuarioService.cadastrarUsuario(usuario);
-            UsuarioResponseDTO responseDTO = UsuarioMapper.toResponseDTO(usuarioSalvo);
-            return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
-        } catch (IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-    }
+    Usuario usuario = UsuarioMapper.toEntity(dto);
+    Usuario usuarioSalvo = usuarioService.cadastrarUsuario(usuario);
+    UsuarioResponseDTO responseDTO = UsuarioMapper.toResponseDTO(usuarioSalvo);
+
+    return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+}
 }

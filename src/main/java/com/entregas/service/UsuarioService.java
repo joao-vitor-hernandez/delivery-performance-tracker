@@ -3,10 +3,8 @@ package com.entregas.service;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.entregas.model.Usuario;
 import com.entregas.repository.UsuarioRepository;
-
 import java.util.Optional;
 
 @Service
@@ -14,7 +12,6 @@ public class UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
-
     public Usuario cadastrarUsuario(Usuario usuario) {
         // Regra de Negócio: Impede a duplicação de e-mail/username no sistema
         if (usuarioRepository.findByUsername(usuario.getUsername()).isPresent()) {
