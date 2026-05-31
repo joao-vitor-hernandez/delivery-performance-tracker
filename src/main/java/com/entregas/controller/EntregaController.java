@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.entregas.model.Entrega;
 import com.entregas.service.EntregaService;
+import jakarta.validation.Valid;
 import com.entregas.dto.request.EntregaRequestDTO;
 import com.entregas.dto.response.EntregaResponseDTO;
 import com.entregas.mapper.EntregaMapper;
@@ -22,7 +23,7 @@ public class EntregaController {
     }
 
     @PostMapping
-    public ResponseEntity<EntregaResponseDTO> registrarEntrega(@RequestBody EntregaRequestDTO dto){
+    public ResponseEntity<EntregaResponseDTO> registrarEntrega(@Valid@RequestBody EntregaRequestDTO dto){
         try {
             Entrega entrega = EntregaMapper.toEntity(dto);
             Entrega entregaSalva = entregaService.salvarOuAtualizar(entrega);

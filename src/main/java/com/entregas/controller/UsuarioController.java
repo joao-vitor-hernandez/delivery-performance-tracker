@@ -7,10 +7,11 @@ import org.springframework.web.bind.annotation.*;
 
 import com.entregas.model.Usuario;
 import com.entregas.service.UsuarioService;
+import jakarta.validation.Valid;
 import com.entregas.dto.request.UsuarioRequestDTO;
 import com.entregas.dto.response.UsuarioResponseDTO;
 import com.entregas.mapper.UsuarioMapper;
-import com.entregas.model.Usuario;
+//import com.entregas.model.Usuario;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -25,7 +26,7 @@ public class UsuarioController {
     //Endpoint para criar novo usuário
     //Rota: POST http://localhost:8080/api/usuarios/registrar
     @PostMapping("/registrar")
-    public ResponseEntity<UsuarioResponseDTO> registrarUsuario(@RequestBody UsuarioRequestDTO dto) {
+    public ResponseEntity<UsuarioResponseDTO> registrarUsuario(@Valid @RequestBody UsuarioRequestDTO dto) {
         try {
             Usuario usuario = UsuarioMapper.toEntity(dto);
             Usuario usuarioSalvo = usuarioService.cadastrarUsuario(usuario);

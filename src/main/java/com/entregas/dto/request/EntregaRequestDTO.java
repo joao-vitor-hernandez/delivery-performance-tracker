@@ -1,12 +1,18 @@
 package com.entregas.dto.request;
 
 import java.time.LocalDate;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Min;
 
 public class EntregaRequestDTO {
 
+    @NotNull(message = "O ID do usuário é obrigatório")
     private Long usuarioId;
+    @NotNull(message = "A data é obrigatória")
     private LocalDate data;
+    @Min(value = 0, message = "Sucessos não pode ser negativo")
     private int sucessos;
+    @Min(value = 0, message = "Falhas não pode ser negativo")
     private int falhas;
 
     public EntregaRequestDTO() {
