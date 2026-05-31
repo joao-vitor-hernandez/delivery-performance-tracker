@@ -7,6 +7,10 @@ import org.springframework.web.bind.annotation.*;
 
 import com.entregas.model.Usuario;
 import com.entregas.service.UsuarioService;
+import com.entregas.dto.request.UsuarioRequestDTO;
+import com.entregas.dto.response.UsuarioResponseDTO;
+import com.entregas.mapper.UsuarioMapper;
+import com.entregas.model.Usuario;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -21,12 +25,14 @@ public class UsuarioController {
     //Endpoint para criar novo usuário
     //Rota: POST http://localhost:8080/api/usuarios/registrar
     @PostMapping("/registrar")
-    public ResponseEntity<String> registrarUsuario(@RequestBody Usuario novoUsuario) {
+    public ResponseEntity<UsuarioResponseDTO> registrarUsuario(@RequestBody UsuarioRequestDTO dto) {
         try {
-            usuarioService.cadastrarUsuario(novoUsuario);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Usuário registrado com sucesso!");
+            Usuario usuario = UsuarioMapper.toEntity(dto);
+            Usuario usuarioSalvo = usuarioService.cadastrarUsuario(usuario);
+            UsuarioResponseDTO responseDTO = UsuarioMapper.toResponseDTO(usuarioSalvo);
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
         } catch (IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 }
