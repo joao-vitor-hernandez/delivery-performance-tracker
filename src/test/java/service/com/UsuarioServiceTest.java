@@ -75,4 +75,22 @@ public class UsuarioServiceTest {
         assertNotEquals("senha123", novoUsuario.getSenhaHash(), "A senha não foi criptografada!");
         assertTrue(BCrypt.checkpw("senha123", novoUsuario.getSenhaHash()), "O hash gerado pelo BCrypt é inválido.");
     }
+
+    @Test
+    @DisplayName("Deve impedir cadastro de usuário duplicado")
+    void deveImpedirCadastroDuplicado() {
+        Usuario usuarioDuplicado = new Usuario("admin", "senha123");
+        when(usuarioRepository.findByUsername("admin")).thenReturn(Optional.of(usuarioMock));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> usuarioService.cadastrarUsuario(usuarioDuplicado));
+        assertEquals("Este usuário já está cadastrado no sistema!", exception.getMessage());
+        verify(usuarioRepository, never()).save(any(Usuario.class));
+    }
+
+    @Test
+    @DisplayName("Deve retornar vazio quando usuário não existir")
+    void deveRetornarVazioParaUsuarioInexistente() {
+        when(usuarioRepository.findByUsername("inexistente")).thenReturn(Optional.empty());
+        Optional<Usuario> resultado = usuarioService.login("inexistente", "senha123");
+        assertTrue(resultado.isEmpty(), "O resultado deve ser vazio para usuário inexistente.");
+    }
 }

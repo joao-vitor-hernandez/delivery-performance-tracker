@@ -50,17 +50,6 @@ public class EntregaServiceTest {
     }
 
     @Test
-    @DisplayName("Deve retornar zero se o total de pacotes na lista for zero")
-    void deveTratarDivisaoPorZeroAoCalcularTaxa() {
-        List<Entrega> entregas = new ArrayList<>();
-        Entrega entregaVazia = new Entrega(1L, null, LocalDate.now(), 0, 0);
-        entregas.add(entregaVazia);
-
-        double taxaCalculada = entregaService.calcularTaxaSucesso(entregas);
-        assertEquals(0.0, taxaCalculada, "Se não há pacotes movimentados, a taxa deve ser 0 para evitar divisão por zero.");
-    }
-
-    @Test
     @DisplayName("STRESS: Deve calcular corretamente a projeção para meta de 98% (Nível Platina)")
     void deveCalcularProjecaoPlatinaComSucesso() {
         List<Entrega> entregas = new ArrayList<>();
@@ -102,5 +91,39 @@ public class EntregaServiceTest {
 
         // CORREÇÃO: Verifica se o método correto foi invocado no repositório
         verify(repository, times(1)).findByUsuarioId(usuarioIdExemplo);
+    }
+
+    @Test
+    @DisplayName("Deve retornar zero quando a meta de 98% for atingida")
+    void deveRetornarZeroQuandoMetaPlatinaAtingida() {
+        List<Entrega> entregas = new ArrayList<>();
+        entregas.add(new Entrega(1L, LocalDate.now(), 98,2));
+        int resultado = entregaService.calcularProjecaoPlatina(entregas, 0.98);
+        assertEquals(0, resultado, "Não devem faltar entregas quando a meta é atingida");
+    }
+
+    @Test
+    @DisplayName("Deve retornar zero quando a meta de 98% for ultrapassada")
+    void deveRetornarZeroQuandoMetaPlatinaUltrapassada() {
+        List<Entrega> entregas = new ArrayList<>();
+        entregas.add(new Entrega(1L, LocalDate.now(),99,1));
+        int resultado = entregaService.calcularProjecaoPlatina(entregas, 0.98);
+        assertEquals(0, resultado, "Não devem faltar entregas quando a meta é ultrapassada");
+    }
+
+    @Test
+    @DisplayName("Deve retornar zero para lista vazia")
+    void deveRetornarZeroParaListaVazia() {
+        List<Entrega> entregas = new ArrayList<>();
+        double taxa = entregaService.calcularTaxaSucesso(entregas);
+        assertEquals(0.0, taxa, "A taxa deve ser zero quando não existem entregas");
+    }
+
+    @Test
+    @DisplayName("Deve retornar zero na projeção quando a lista estiver vazia")
+    void deveRetornarZeroNaProjecaoComListaVazia() {
+        List<Entrega> entregas = new ArrayList<>();
+        int resultado = entregaService.calcularProjecaoPlatina(entregas, 0.98);
+        assertEquals(0, resultado, "A projeção deve ser zero quando não existem entregas");
     }
 }
