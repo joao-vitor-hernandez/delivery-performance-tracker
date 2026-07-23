@@ -6,15 +6,15 @@ public class LoginRequestDTO {
     @NotBlank(message = "O campo 'username' é obrigatório")
     private String username;
 
-    @NotBlank(message = "O campo 'password' é obrigatório")
-    private String password;
+    @NotBlank(message = "O campo 'senha' é obrigatório")
+    private String senha;
 
     public LoginRequestDTO() {
     }
 
-    public LoginRequestDTO(String username, String password) {
+    public LoginRequestDTO(String username, String senha) {
         this.username = username;
-        this.password = password;
+        this.senha = senha;
     }
 
     public String getUsername() {
@@ -24,10 +24,10 @@ public class LoginRequestDTO {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
+    public String getSenha() {
+        return senha;
     }
-    public void setPassword(String password) {
-        this.password = password;
+    public void setSenha(String senha) {
+        this.senha = senha;
     }
 }
