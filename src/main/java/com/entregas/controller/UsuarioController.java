@@ -12,7 +12,14 @@ import com.entregas.dto.request.UsuarioRequestDTO;
 import com.entregas.dto.response.UsuarioResponseDTO;
 import com.entregas.mapper.UsuarioMapper;
 //import com.entregas.model.Usuario;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
+@Tag(
+    name = "Usuários",
+    description = "Operações relacionadas aos usuários"
+)
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
@@ -25,12 +32,29 @@ public class UsuarioController {
 
     //Endpoint para criar novo usuário
     //Rota: POST http://localhost:8080/api/usuarios/registrar
-    @PostMapping("/registrar")
-    public ResponseEntity<UsuarioResponseDTO> registrarUsuario(@Valid @RequestBody UsuarioRequestDTO dto) {
-    Usuario usuario = UsuarioMapper.toEntity(dto);
-    Usuario usuarioSalvo = usuarioService.cadastrarUsuario(usuario);
-    UsuarioResponseDTO responseDTO = UsuarioMapper.toResponseDTO(usuarioSalvo);
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
-}
+    @Operation(
+        summary = "Cadastrar usuário",
+        description = "Cria um novo usuário no sistema"
+    )
+    @ApiResponse(
+        responseCode = "201",
+        description = "Usuário criado com sucesso"
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "Dados inválidos"
+    )
+    @PostMapping("/registrar")
+    public ResponseEntity<UsuarioResponseDTO> registrarUsuario(
+            @Valid @RequestBody UsuarioRequestDTO dto) {
+
+        Usuario usuario = UsuarioMapper.toEntity(dto);
+        Usuario usuarioSalvo = usuarioService.cadastrarUsuario(usuario);
+        UsuarioResponseDTO responseDTO = UsuarioMapper.toResponseDTO(usuarioSalvo);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(responseDTO);
+    }
 }

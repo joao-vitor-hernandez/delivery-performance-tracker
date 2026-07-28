@@ -22,7 +22,7 @@ public class Usuario {
     private String senhaHash;
 
     // 1. Construtor padrão obrigatório pelo JPA/Hibernate
-    protected Usuario() {
+    public Usuario() {
     }
 
     // 2. Construtor completo adaptado para Long

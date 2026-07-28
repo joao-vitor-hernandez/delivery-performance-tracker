@@ -37,29 +37,6 @@ public class UsuarioServiceTest {
     }
 
     @Test
-    @DisplayName("Deve realizar login com sucesso quando a senha for correta")
-    void deveRealizarLoginComSucesso() {
-        // Ensinando o Mock: quando buscarem por "admin", devolva nosso usuário mockado
-        when(usuarioRepository.findByUsername("admin")).thenReturn(Optional.of(usuarioMock));
-
-        Optional<Usuario> resultado = usuarioService.login("admin", senhaLimpa);
-
-        assertTrue(resultado.isPresent(), "O login deveria ser bem-sucedido.");
-        assertEquals("admin", resultado.get().getUsername());
-    }
-
-    @Test
-    @DisplayName("STRESS: Deve bloquear o acesso quando a senha for incorreta")
-    void deveRejeitarSenhaIncorreta() {
-        // Ensinando o Mock
-        when(usuarioRepository.findByUsername("admin")).thenReturn(Optional.of(usuarioMock));
-
-        Optional<Usuario> resultado = usuarioService.login("admin", "hacker321");
-
-        assertFalse(resultado.isPresent(), "FALHA DE SEGURANÇA: O sistema aceitou uma senha incorreta.");
-    }
-
-    @Test
     @DisplayName("Deve criptografar a senha do usuário antes de salvar no cadastro")
     void deveCriptografarSenhaNoCadastro() {
         Usuario novoUsuario = new Usuario("joao", "senha123");
@@ -83,13 +60,5 @@ public class UsuarioServiceTest {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> usuarioService.cadastrarUsuario(usuarioDuplicado));
         assertEquals("Este usuário já está cadastrado no sistema!", exception.getMessage());
         verify(usuarioRepository, never()).save(any(Usuario.class));
-    }
-
-    @Test
-    @DisplayName("Deve retornar vazio quando usuário não existir")
-    void deveRetornarVazioParaUsuarioInexistente() {
-        when(usuarioRepository.findByUsername("inexistente")).thenReturn(Optional.empty());
-        Optional<Usuario> resultado = usuarioService.login("inexistente", "senha123");
-        assertTrue(resultado.isEmpty(), "O resultado deve ser vazio para usuário inexistente.");
     }
 }

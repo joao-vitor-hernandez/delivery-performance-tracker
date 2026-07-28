@@ -1,8 +1,17 @@
 package com.entregas.dto.response;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class LoginResponseDTO {
+    @Schema(
+    description = "JWT gerado após autenticação",
+    example = "eyJhbGciOiJIUzI1NiJ9..."
+    )
     private String token;
 
+    @Schema(
+        description = "Tipo de token gerado",
+        example = "Bearer"
+    )
     public String tipo = "Bearer";
 
     public LoginResponseDTO() {

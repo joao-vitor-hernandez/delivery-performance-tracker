@@ -1,12 +1,21 @@
 package com.entregas.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class LoginRequestDTO {
-    @NotBlank(message = "O campo 'username' é obrigatório")
+    @Schema(
+    description = "Nome de usuário para autenticação",
+    example = "joaovitor"
+    )
+    @NotBlank(message = "O username é obrigatório")
     private String username;
 
-    @NotBlank(message = "O campo 'senha' é obrigatório")
+    @Schema(
+        description = "Senha utilizada para autenticação",
+        example = "Senha@123"
+    )
+    @NotBlank(message = "A senha é obrigatória")
     private String senha;
 
     public LoginRequestDTO() {
