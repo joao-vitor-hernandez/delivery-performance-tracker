@@ -16,6 +16,9 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationProvider;
+
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -24,98 +27,113 @@ import java.util.List;
 
 @Configuration
 public class SecurityConfig {
+        private final CustomUserDetailsService userDetailsService;
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+        private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    private final AuthenticationEntryPoint authenticationEntryPoint;
+        private final AuthenticationEntryPoint authenticationEntryPoint;
 
-    public SecurityConfig(
-            JwtAuthenticationFilter jwtAuthenticationFilter,
-            JwtAuthenticationEntryPoint authenticationEntryPoint) {
+        public SecurityConfig(
+                JwtAuthenticationFilter jwtAuthenticationFilter,
+                JwtAuthenticationEntryPoint authenticationEntryPoint,
+                CustomUserDetailsService userDetailsService) {
 
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-        this.authenticationEntryPoint = authenticationEntryPoint;
-    }
+                this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+                this.authenticationEntryPoint = authenticationEntryPoint;
+                this.userDetailsService = userDetailsService;
+        }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
-            throws Exception {
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http)
+                throws Exception {
 
-        http
+                http
 
-                .csrf(csrf -> csrf.disable())
+                        .csrf(csrf -> csrf.disable())
 
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .sessionManagement(session ->
+                                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                .exceptionHandling(exception ->
-                        exception.authenticationEntryPoint(authenticationEntryPoint))
+                        .exceptionHandling(exception ->
+                                exception.authenticationEntryPoint(authenticationEntryPoint))
 
-                .authorizeHttpRequests(auth -> auth
+                        .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers(
-                                "/login",
-                                "/api/usuarios/registrar",
-                                "/h2-console/**"
-                        ).permitAll()
+                                .requestMatchers(
+                                        "/login",
+                                        "/api/usuarios/registrar",
+                                        "/h2-console/**"
+                                ).permitAll()
 
-                        .anyRequest()
+                                .anyRequest()
 
-                        .authenticated())
+                                .authenticated())
 
-                .headers(headers ->
-                        headers.frameOptions(frame -> frame.disable()))
+                        .headers(headers ->
+                                headers.frameOptions(frame -> frame.disable()))
 
-                .addFilterBefore(
-                        jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class);
+                        .addFilterBefore(
+                                jwtAuthenticationFilter,
+                                UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+                return http.build();
+        }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
+        @Bean
+        public AuthenticationProvider authenticationProvider() {
 
-        return new BCryptPasswordEncoder();
-    }
+                DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
 
-    @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration configuration)
-            throws Exception {
+                provider.setUserDetailsService(userDetailsService);
 
-        return configuration.getAuthenticationManager();
-    }
+                provider.setPasswordEncoder(passwordEncoder());
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+                return provider;
+        }
 
-        CorsConfiguration configuration = new CorsConfiguration();
+        @Bean
+        public PasswordEncoder passwordEncoder() {
 
-        configuration.setAllowedOriginPatterns(List.of("*"));
+                return new BCryptPasswordEncoder();
+        }
 
-        configuration.setAllowCredentials(false);
+        @Bean
+        public AuthenticationManager authenticationManager(
+                AuthenticationConfiguration configuration)
+                throws Exception {
 
-        configuration.setAllowedMethods(List.of(
-                "GET",
-                "POST",
-                "PUT",
-                "DELETE",
-                "OPTIONS"
-        ));
+                return configuration.getAuthenticationManager();
+        }
 
-        configuration.setAllowedHeaders(List.of("*"));
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
 
-        configuration.setExposedHeaders(List.of("Authorization"));
+                CorsConfiguration configuration = new CorsConfiguration();
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
+                configuration.setAllowedOriginPatterns(List.of("*"));
 
-        source.registerCorsConfiguration("/**", configuration);
+                configuration.setAllowCredentials(false);
 
-        return source;
-    }
+                configuration.setAllowedMethods(List.of(
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "DELETE",
+                        "OPTIONS"
+                ));
+
+                configuration.setAllowedHeaders(List.of("*"));
+
+                configuration.setExposedHeaders(List.of("Authorization"));
+
+                UrlBasedCorsConfigurationSource source =
+                        new UrlBasedCorsConfigurationSource();
+
+                source.registerCorsConfiguration("/**", configuration);
+
+                return source;
+        }
 
 }

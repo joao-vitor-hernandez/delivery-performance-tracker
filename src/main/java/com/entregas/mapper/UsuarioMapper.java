@@ -10,10 +10,12 @@ public class UsuarioMapper {
     }
 
     public static Usuario toEntity(UsuarioRequestDTO dto) {
-        return new Usuario(
-                dto.getUsername(),
-                dto.getSenha()
-        );
+        Usuario usuario = new Usuario();
+        
+        usuario.setUsername(dto.getUsername());
+
+        usuario.setSenhaHash(dto.getSenha());
+        return usuario;
     }
 
     public static UsuarioResponseDTO toResponseDTO(Usuario usuario) {

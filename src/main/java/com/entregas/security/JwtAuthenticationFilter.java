@@ -14,9 +14,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     private final JwtService jwtService;
 
@@ -56,7 +61,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             username = jwtService.extractUsername(jwt);
-        } catch (Exception e) {
+        } catch (ExpiredJwtException e) {
+            logger.warn("JWT expirado.");
+            filterChain.doFilter(request, response);
+            return;
+        } catch (JwtException e) {
+            logger.warn("JWT inválido.");
             filterChain.doFilter(request, response);
             return;
         }
