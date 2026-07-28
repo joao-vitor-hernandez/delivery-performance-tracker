@@ -14,6 +14,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final UsuarioRepository usuarioRepository;
 
+    private static final String DEFAULT_ROLE = "ROLE_USER";
+    
     public CustomUserDetailsService(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
     }
@@ -29,7 +31,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         return User.builder()
                 .username(usuario.getUsername())
                 .password(usuario.getSenhaHash())
-                .authorities(List.of(new SimpleGrantedAuthority("ROLE_USER")))
+                .authorities(List.of(new SimpleGrantedAuthority(DEFAULT_ROLE)))
                 .build();
     }
 }

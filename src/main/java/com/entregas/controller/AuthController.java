@@ -17,7 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping
+@RequestMapping("/auth")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -32,7 +32,7 @@ public class AuthController {
         this.jwtService = jwtService;
     }
 
-    @PostMapping("/login")
+    @PostMapping("/auth/login")
     public ResponseEntity<LoginResponseDTO> login(
             @Valid @RequestBody LoginRequestDTO request) {
 
