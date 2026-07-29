@@ -1,18 +1,60 @@
-# --- Banco de Dados e Logs (Segurança) ---
+# =====================================================
+# Banco de Dados e Logs
+# =====================================================
 *.db
 *.log
 
-# --- Compilação do Maven (Arquivos Gerados) ---
+# Banco H2 (caso futuramente utilize arquivo ao invés de memória)
+*.mv.db
+*.trace.db
+
+# =====================================================
+# Maven / Java
+# =====================================================
 target/
 *.class
 
-# --- Configurações do VS Code / Eclipse ---
+# Arquivos gerados pelo Maven Wrapper (opcional)
+.mvn/wrapper/maven-wrapper.jar
+
+# =====================================================
+# IDEs
+# =====================================================
+
+# VS Code
 .vscode/
+
+# Eclipse
 .settings/
 .classpath
 .project
 .factorypath
 
-# --- Configurações do IntelliJ (Caso use futuramente) ---
+# IntelliJ IDEA
 .idea/
 *.iml
+out/
+
+# =====================================================
+# Sistema Operacional
+# =====================================================
+
+# Windows
+Thumbs.db
+
+# macOS
+.DS_Store
+
+# =====================================================
+# Arquivos de ambiente
+# =====================================================
+
+.env
+.env.*
+
+# =====================================================
+# Configurações locais
+# =====================================================
+
+application-local.properties
+application-dev-local.properties
