@@ -1,6 +1,7 @@
 package com.entregas.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.Optional;
@@ -13,6 +14,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.entregas.model.Usuario;
 import com.entregas.repository.UsuarioRepository;
@@ -22,6 +24,9 @@ public class UsuarioServiceTest {
 
     @Mock
     private UsuarioRepository usuarioRepository;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UsuarioService usuarioService;
@@ -44,6 +49,7 @@ public class UsuarioServiceTest {
         // Simulando que o usuário ainda não existe no sistema
         when(usuarioRepository.findByUsername("joao")).thenReturn(Optional.empty());
         when(usuarioRepository.save(any(Usuario.class))).thenReturn(novoUsuario);
+        when(passwordEncoder.encode("senha123")).thenReturn(BCrypt.hashpw("senha123", BCrypt.gensalt()));
 
         usuarioService.cadastrarUsuario(novoUsuario);
 
@@ -57,8 +63,8 @@ public class UsuarioServiceTest {
     void deveImpedirCadastroDuplicado() {
         Usuario usuarioDuplicado = new Usuario("admin", "senha123");
         when(usuarioRepository.findByUsername("admin")).thenReturn(Optional.of(usuarioMock));
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> usuarioService.cadastrarUsuario(usuarioDuplicado));
-        assertEquals("Este usuário já está cadastrado no sistema!", exception.getMessage());
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> usuarioService.cadastrarUsuario(usuarioDuplicado));
+        assertEquals("Username já cadastrado.", exception.getMessage());
         verify(usuarioRepository, never()).save(any(Usuario.class));
     }
 }
