@@ -62,7 +62,7 @@ public class SecurityConfig {
                         .authorizeHttpRequests(auth -> auth
 
                                 .requestMatchers(
-                                        "/login",
+                                        "/auth/login",
                                         "/api/usuarios/registrar",
                                         "/h2-console/**",
                                         "/v3/api-docs/**",

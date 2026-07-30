@@ -32,7 +32,7 @@ public class AuthController {
         this.jwtService = jwtService;
     }
 
-    @PostMapping("/auth/login")
+    @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(
             @Valid @RequestBody LoginRequestDTO request) {
 

@@ -57,9 +57,10 @@ public class JwtService {
     public String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     }
-    Date now = new Date();
-    Date expirationDate = new Date(now.getTime() + expiration);
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+    public String generateToken(Map<String, Object> extraClaims,UserDetails userDetails) {
+        Date now = new Date();
+        Date expirationDate = new Date(now.getTime() + expiration);
+
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
