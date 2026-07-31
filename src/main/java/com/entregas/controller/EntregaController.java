@@ -76,9 +76,8 @@ public class EntregaController {
         responseCode = "404",
         description = "Usuário não encontrado."
     )
-    @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<List<EntregaResponseDTO>> listarPorUsuario(
-            @PathVariable Long usuarioId) {
+    @GetMapping("/minhas")
+    public ResponseEntity<List<EntregaResponseDTO>> listarMinhasEntregas() {
         
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -107,11 +106,14 @@ public class EntregaController {
         responseCode = "404",
         description = "Usuário não encontrado."
     )
-    @GetMapping("/usuario/{usuarioId}/projecao")
-    public ResponseEntity<Integer> obterProjecaoPlatina(
-            @PathVariable Long usuarioId) {
+    @GetMapping("/minhas/projecao")
+    public ResponseEntity<Integer> obterMinhaProjecaoPlatina() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        List<Entrega> entregas = entregaService.obterEntregasDoMesAtual(usuarioId);
+        String username = authentication.getName();
+
+        Usuario usuario = usuarioService.buscarPorUsername(username);
+        List<Entrega> entregas = entregaService.obterEntregasDoMesAtual(usuario.getId());
 
         int entregasFaltantes = entregaService.calcularProjecaoPlatina(
                 entregas,
