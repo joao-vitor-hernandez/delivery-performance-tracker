@@ -3,6 +3,7 @@ package com.entregas.service;
 import com.entregas.model.Usuario;
 import com.entregas.repository.UsuarioRepository;
 
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,5 +34,12 @@ public class UsuarioService {
 
         return usuarioRepository.save(usuario);
     }
+    public Usuario buscarPorUsername(String username) {
 
+        return usuarioRepository.findByUsername(username)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException(
+                                "Usuário não encontrado."
+                        ));
+    }
 }
