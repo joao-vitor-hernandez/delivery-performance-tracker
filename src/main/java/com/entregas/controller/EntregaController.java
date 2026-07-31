@@ -79,8 +79,14 @@ public class EntregaController {
     @GetMapping("/usuario/{usuarioId}")
     public ResponseEntity<List<EntregaResponseDTO>> listarPorUsuario(
             @PathVariable Long usuarioId) {
+        
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        List<Entrega> entregas = entregaService.obterEntregasDoMesAtual(usuarioId);
+        String username = authentication.getName();
+
+        Usuario usuario = usuarioService.buscarPorUsername(username);
+
+        List<Entrega> entregas = entregaService.obterEntregasDoMesAtual(usuario.getId());
 
         List<EntregaResponseDTO> response = entregas.stream()
                 .map(EntregaMapper::toResponseDTO)
