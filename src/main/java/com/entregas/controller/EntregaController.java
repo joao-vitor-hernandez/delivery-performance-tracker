@@ -3,13 +3,17 @@ package com.entregas.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.entregas.service.UsuarioService;
 import com.entregas.model.Entrega;
 import com.entregas.service.EntregaService;
 import jakarta.validation.Valid;
 import com.entregas.dto.request.EntregaRequestDTO;
 import com.entregas.dto.response.EntregaResponseDTO;
 import com.entregas.mapper.EntregaMapper;
+import com.entregas.model.Usuario;
 
 import java.util.List;
 
@@ -28,8 +32,11 @@ public class EntregaController {
 
     private final EntregaService entregaService;
 
-    public EntregaController(EntregaService entregaService) {
+    private final UsuarioService usuarioService;
+
+    public EntregaController(EntregaService entregaService,UsuarioService usuarioService) {
         this.entregaService = entregaService;
+        this.usuarioService = usuarioService;
     }
 
     @Operation(
