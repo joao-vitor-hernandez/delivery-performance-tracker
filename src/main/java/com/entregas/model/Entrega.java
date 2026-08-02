@@ -24,6 +24,13 @@ public class Entrega {
     private int falhas;
 
     public Entrega(){}
+
+    public Entrega(LocalDate data, int sucessos, int falhas) {
+        validarValores(sucessos, falhas);
+        this.data = data;
+        this.sucessos = sucessos;
+        this.falhas = falhas;
+    }
     // 2. Construtor completo (O botão que "imprime" uma ficha nova preenchida)
     public Entrega(Long id, Long usuarioId, LocalDate data, int sucessos, int falhas) {
         validarValores(sucessos,falhas);

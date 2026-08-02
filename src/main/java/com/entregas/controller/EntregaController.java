@@ -55,9 +55,21 @@ public class EntregaController {
     public ResponseEntity<EntregaResponseDTO> registrarEntrega(
             @Valid @RequestBody EntregaRequestDTO dto) {
 
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String username = authentication.getName();
+
+        Usuario usuario = usuarioService.buscarPorUsername(username);
+
         Entrega entrega = EntregaMapper.toEntity(dto);
+
+        entrega.setUsuarioId(usuario.getId());
+
         Entrega entregaSalva = entregaService.salvarOuAtualizar(entrega);
-        EntregaResponseDTO responseDTO = EntregaMapper.toResponseDTO(entregaSalva);
+
+        EntregaResponseDTO responseDTO =
+                EntregaMapper.toResponseDTO(entregaSalva);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

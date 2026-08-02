@@ -6,12 +6,6 @@ import jakarta.validation.constraints.Min;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public class EntregaRequestDTO {
-    @Schema(
-    description = "ID do usuário responsável pela entrega",
-    example = "1"
-    )
-    @NotNull(message = "O ID do usuário é obrigatório")
-    private Long usuarioId;
 
     @Schema(
         description = "Data da entrega",
@@ -35,14 +29,6 @@ public class EntregaRequestDTO {
     private int falhas;
 
     public EntregaRequestDTO() {
-    }
-
-    public Long getUsuarioId() {
-        return usuarioId;
-    }
-
-    public void setUsuarioId(Long usuarioId) {
-        this.usuarioId = usuarioId;
     }
 
     public LocalDate getData() {

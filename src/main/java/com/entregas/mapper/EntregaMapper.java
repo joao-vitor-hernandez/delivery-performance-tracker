@@ -11,7 +11,6 @@ public class EntregaMapper {
 
     public static Entrega toEntity(EntregaRequestDTO dto) {
         return new Entrega(
-                dto.getUsuarioId(),
                 dto.getData(),
                 dto.getSucessos(),
                 dto.getFalhas()
