@@ -14,7 +14,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.entregas.model.Entrega;
+import com.entregas.model.Usuario;
 import com.entregas.service.EntregaService;
+import com.entregas.service.UsuarioService;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,7 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import org.springframework.http.MediaType;
-
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
@@ -39,86 +41,108 @@ class EntregaControllerTest {
     @MockBean
     private EntregaService entregaService;
 
-    @Test
-    @DisplayName("Deve cadastrar entrega válida")
-    void deveCadastrarEntregaValida() throws Exception {
+    @MockBean
+    private UsuarioService usuarioService;
+
+        @Test
+        @WithMockUser(username = "teste2")
+        @DisplayName("Deve cadastrar entrega válida")
+        void deveCadastrarEntregaValida() throws Exception {
+
+        Usuario usuario = new Usuario(
+                1L,
+                "teste2",
+                "senhaHash"
+        );
 
         Entrega entrega = new Entrega(
                 1L,
-                LocalDate.of(2026,7,21),
+                1L,
+                LocalDate.of(2026, 7, 21),
                 50,
-                2);
+                2
+        );
+
+        when(usuarioService.buscarPorUsername("teste2"))
+                .thenReturn(usuario);
 
         when(entregaService.salvarOuAtualizar(any()))
                 .thenReturn(entrega);
 
         String json = """
-            {
-                "usuarioId":1,
+                {
                 "data":"2026-07-21",
                 "sucessos":50,
                 "falhas":2
-            }
-            """;
+                }
+                """;
 
         mockMvc.perform(post("/api/entregas")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
-                .andExpect(status().isCreated());
-    }
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.usuarioId").value(1))
+                .andExpect(jsonPath("$.sucessos").value(50))
+                .andExpect(jsonPath("$.falhas").value(2));
+        }
 
-    @Test
-    @DisplayName("Deve retornar 400 quando usuarioId não for informado")
-    void deveRetornar400QuandoUsuarioIdNaoInformado() throws Exception {
+        @Test
+        @WithMockUser(username = "teste2")
+        @DisplayName("Deve listar entregas do usuário autenticado")
+        void deveListarEntregasDoUsuario() throws Exception {
 
-        String json = """
-            {
-                "data":"2026-07-21",
-                "sucessos":50,
-                "falhas":2
-            }
-            """;
-
-        mockMvc.perform(post("/api/entregas")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("Deve listar entregas do usuário")
-    void deveListarEntregasPorUsuario() throws Exception {
+        Usuario usuario = new Usuario(
+                1L,
+                "teste2",
+                "senhaHash"
+        );
 
         List<Entrega> lista = List.of(
-
                 new Entrega(
                         1L,
-                        LocalDate.of(2026,7,20),
+                        1L,
+                        LocalDate.of(2026, 7, 20),
                         40,
-                        1)
-
+                        1
+                )
         );
+
+        when(usuarioService.buscarPorUsername("teste2"))
+                .thenReturn(usuario);
 
         when(entregaService.obterEntregasDoMesAtual(1L))
                 .thenReturn(lista);
 
-        mockMvc.perform(get("/api/entregas/usuario/1"))
+        mockMvc.perform(get("/api/entregas/minhas"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].usuarioId").value(1))
                 .andExpect(jsonPath("$[0].sucessos").value(40))
                 .andExpect(jsonPath("$[0].falhas").value(1));
-    }
+        }
 
-    @Test
-    @DisplayName("Deve retornar projeção Platina")
-    void deveRetornarProjecaoPlatina() throws Exception {
+        @Test
+        @WithMockUser(username = "teste2")
+        @DisplayName("Deve retornar projeção Platina do usuário autenticado")
+        void deveRetornarProjecaoPlatina() throws Exception {
+
+        Usuario usuario = new Usuario(
+                1L,
+                "teste2",
+                "senhaHash"
+        );
 
         List<Entrega> lista = List.of(
                 new Entrega(
                         1L,
+                        1L,
                         LocalDate.now(),
                         80,
-                        20));
+                        20
+                )
+        );
+
+        when(usuarioService.buscarPorUsername("teste2"))
+                .thenReturn(usuario);
 
         when(entregaService.obterEntregasDoMesAtual(1L))
                 .thenReturn(lista);
@@ -126,8 +150,27 @@ class EntregaControllerTest {
         when(entregaService.calcularProjecaoPlatina(anyList(), eq(0.98)))
                 .thenReturn(900);
 
-        mockMvc.perform(get("/api/entregas/usuario/1/projecao"))
+        mockMvc.perform(get("/api/entregas/minhas/projecao"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("900"));
-    }
+        }
+
+        @Test
+        @WithMockUser(username = "teste2")
+        @DisplayName("Deve retornar 400 quando data não for informada")
+        void deveRetornar400QuandoDataNaoInformada() throws Exception {
+
+        String json = """
+                {
+                "sucessos":50,
+                "falhas":2
+                }
+                """;
+
+        mockMvc.perform(post("/api/entregas")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("A data é obrigatória"));
+        }
 }
